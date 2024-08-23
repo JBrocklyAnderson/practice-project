@@ -1,0 +1,11 @@
+# Ignore unnecessary data
+data/*
+data/CVE_V5/*
+
+# Whitelist data files that the journals depend on
+!data/MITRE_2024_IoT_CVEs.xlsx
+!data/Global_Dataset.xlsx
+!data/mitre-enterprise-attack-v15.1.xlsx
+
+# Ignore 
+.ipynb_checkpoints/
