@@ -4,11 +4,9 @@ data/CVE_V5/*
 data/CVE_V4.15/*
 
 # Whitelist data files that the journals depend on
-!data/MITRE/MITRE_2024_IoT_CVEs.xlsx
-!data/Global_Dataset.xlsx
-!data/MITRE/mitre-enterprise-attack-v15.1.xlsx
 !data/CVE_V5/CVE_List.csv
 !data/CWE_V4.15/CWE_List.csv
+!data/IoT_CVE_Attacks.csv
 
 # Ignore
 .ipynb_checkpoints/
