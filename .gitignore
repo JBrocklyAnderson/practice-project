@@ -6,7 +6,7 @@ data/CVE_V4.15/*
 # Whitelist data files that the journals depend on
 !data/CVE_V5/CVE_List.csv
 !data/CWE_V4.15/CWE_List.csv
-!data/IoT_CVE_Attacks.csv
+!data/IoT_CVE_Attacks_Main.csv
 !data/correlation-validation-data.xlsx
 
 # Ignore
