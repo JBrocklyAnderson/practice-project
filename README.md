@@ -1,2 +1,52 @@
-# Analyzing IoT-related CVEs Exploited by Nation-State Threat Actors (NSTAs)
-This repository includes several Jupyter Notebooks dedicated to exploratory data analysis of datasets gathered from the NVD, MITRE corporation, and CISA. This project will eventually contain a machine learning model that will help associate CVEs with IoT devices and the NSTAs that exploit them. 
+# Patch Prioritization Analysis
+<span style='font-weight:900;color:#ff9900;text-shadow:0 0 5px #ffff00;'>PENDING README</span>
+
+
+## Data Sources
+### MITRE
+#### CVE
+
+
+#### CWE
+
+
+### NVD
+
+
+### FIRST
+
+
+### Exploit DB
+
+
+### Setting up the environment
+#### For Conda users
+To create a Conda-managed environment (which is how the researchers recommend setting up the project), run:
+``` bash
+# Create environment
+conda env create -f environment.yml
+
+# Activate environment
+conda activate cybersecurity-env
+```
+#### For Pip Users
+To create a Venv-managed environment with Pip, run:
+``` bash
+# Create virtual environment
+python -m venv cybersecurity-env
+
+# Activate virtual environment
+source cybersecurity-env/bin/activate  # On Windows: cybersecurity-env\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+
+- Patch Release Date
+- Exploit Code Date (1st observed date)
+- MITRE CVE listing date for CVE ✅
+- EPSS (on proof of concept date)
+- CVSS (use version 3.0 and 3.1 but for the missing ones, use other versions but flag them and the version numbers for tracking) ✅
+- CVSS (various metrics) ✅
+- Number of exploit codes available for the CVE

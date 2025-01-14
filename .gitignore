@@ -2,7 +2,13 @@
 *.env
 
 # Ignore unnecessary data
-data/*
+data/raw/*
+data/intermediate/*
+data/defunct/*
 
-# Ignore checkpoint files
+# Ignore checkpoint and cache files
 .ipynb_checkpoints/
+__pycache__/
+
+# Ignore scrap notebooks
+notebooks/extra_notebooks/*
