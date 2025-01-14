@@ -6,25 +6,29 @@ they execute a single section of the code.
 '''
 
 import argparse
-from extractions.cve_extraction import run_cve_extraction
-from extractions.cwe_extraction import run_cwe_extraction
-# from extractions.nvd_extraction import run_nvd_extraction
-# from extractions.epss_extraction import run_epss_extraction
-# from extractions.exploit_db_extraction import run_xdb_extraction
-# from extractions.poc_extraction import run_xdb_extraction
-from extractions.poc_extraction import run_poc_extraction
-from preprocessing.cve_preprocessing import run_cve_preprocessing
-from preprocessing.cwe.cwe_preprocessing import run_cwe_preprocessing
-from preprocessing.cwe.related_cwe_preprocessing import run_related_cwe_preprocessing
-from preprocessing.cwe.cwe_platform_preprocessing import run_cwe_platform_preprocessing
-from preprocessing.cwe.cwe_consequence_preprocessing import run_cwe_consequence_preprocessing
-from preprocessing.cwe.cwe_detection_preprocessing import run_cwe_detection_preprocessing
-from preprocessing.cwe.cwe_mitigation_preprocessing import run_cwe_mitigation_preprocessing
-# from preprocessing.epss_preprocessing import run_epss_preprocessing
-# from preprocessing.nvd_preprocessing import run_nvd_preprocessing
-# from preprocessing.exploit_db_preprocessing import run_xdb_preprocessing
-# from preprocessing.poc_preprocessing import run_poc_preprocessing
-from preprocessing.kev_preprocessing import run_kev_preprocessing
+from extractions import (
+    run_cve_extraction,
+    run_cwe_extraction,
+    # run_nvd_extraction,
+    # run_epss_extraction,
+    # run_xdb_extraction,
+    run_poc_extraction
+)
+
+from preprocessing import (
+    run_cve_preprocessing,
+    run_cwe_preprocessing,
+    run_related_cwe_preprocessing,
+    run_cwe_platform_preprocessing,
+    run_cwe_consequence_preprocessing,
+    run_cwe_detection_preprocessing,
+    run_cwe_mitigation_preprocessing,
+    # run_epss_preprocessing,
+    # run_nvd_preprocessing,
+    # run_xdb_preprocessing,
+    # run_poc_preprocessing,
+    run_kev_preprocessing,
+)
 
 def def_args():
     '''
@@ -324,7 +328,7 @@ def run_tasks(args):
 
     if args.extract_poc:
         file_format = args.poc_format or 'parquet'
-        input_dir = args.poc_input or 'data/raw/exploits/poc/PoC-in-GitHub' # !TBD
+        input_dir = args.poc_input or 'data/raw/exploits/poc/PoC-in-GitHub'
         output_file = args.poc_output or f'data/intermediate/exploits/poc/poc_extracted.{file_format}'
         print('Extracting proof-of-concept data from GitHub...\n')
         run_poc_extraction(input_dir, output_file, file_format)
