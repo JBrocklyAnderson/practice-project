@@ -1,10 +1,10 @@
-"""
+'''
 This script serves as the entry point and orchestrator for the project's
 codebase. It includes the ressource-intensive extraction of data from hundreds
 of thousands of JSON files, large XML files, and API responses, heavy
 preprocessing of this data into useable files, and the merging together of all
 of this data into a format better suited for robust analysis.
-"""
+'''
 
 # * CVE Extraction
 # * CWE Extraction
@@ -12,7 +12,8 @@ of this data into a format better suited for robust analysis.
 # TODO: EPSS Extraction
 # TODO: NVD Extraction
 # TODO: ExploitDB Extraction
-# TODO: CVE Preprocessing
+# TODO: PoC-in-GitHub Extraction
+# * CVE Preprocessing
 # * CWE Preprocessing
 # * CWE Platform Extraction
 # * CWE Consequence Extraction
@@ -27,6 +28,7 @@ of this data into a format better suited for robust analysis.
 # TODO: EPSS Preprocessing
 # TODO: NVD Processing
 # TODO: ExploitDB Preprocessing
+# TODO: PoC-in-GitHub Preprocessing
 # * KEV Preprocessing
 # TODO: Data Merge and Postprocessing
 

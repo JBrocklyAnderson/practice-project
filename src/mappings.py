@@ -6,38 +6,38 @@ extraction and preprocessing steps.
 # § Mappings to extract CVE data
 # § ============================================================================
 CVE_EXTRACTIONS = {
-            'cve_id': ['cveMetadata.cveId'],
-            'cve_desc': ['cna.descriptions.value'],
-            'cve_state': ['cveMetadata.state'],
-            'mitre_cve_res_date': ['cveMetadata.dateReserved'],
-            'mitre_cve_publish_date': ['cveMetadata.datePublished'],
-            'mitre_cve_public_date': ['containers.cna.datePublic'],
-            'cwe_id': ['problemTypes.descriptions.cweId'],
-            'cwe_desc': ['cna.problemTypes.descriptions'],
-            'vendor': ['cna.affected.vendor'],
-            'product': ['cna.affected.product'],
-            'prod_status': ['cna.affected.versions.status'],
-            'prod_defaultStatus': ['cna.affected.defaultStatus'],
-            'prod_version': ['cna.affected.versions.version'],
-            'prod_version_type': ['adp.affected.versions.versionType'],
-            'prod_lessThan': ['adp.affected.versions.lessThan'],
-            'prod_lessThanOrEqual': ['adp.affected.versions.lessThanOrEqual'],
-            'solution': ['cna.solutions.value'],
-            'cve_discovery': ['cna.source.discovery'],
-            'cpe': ['adp.affected.cpes'],
-            'cvss_v2': ['cna.metrics.cvssV2_0.baseScore'],
-            'cvss_v2_vector': ['cna.metrics.cvssV2_0.vectorString'],
-            'cvss_v3': ['cna.metrics.cvssV3_0.baseScore'],
-            'cvss_v3_vector': ['cna.metrics.cvssV3_0.vectorString'],
-            'cvss_v3_1': ['cna.metrics.cvssV3_1.baseScore'],
-            'cvss_v3_1_vector': ['cna.metrics.cvssV3_1.vectorString'],
-            'cvss_v4': ['cna.metrics.cvssV4_0.baseScore'],
-            'cvss_v4_vector': ['cna.metrics.cvssV4_0.vectorString'],
-            'ssvc_exploitation': ['content.options.Exploitation'],
-            'ssvc_automatable': ['content.options.Automatable'],
-            'ssvc_tech_impact': ['content.options.Technical Impact'],
-            'is_kev': ['metrics.other.type']
-        }
+    'cve_id': ['cveMetadata.cveId'],
+    'cve_desc': ['cna.descriptions.value'],
+    'cve_state': ['cveMetadata.state'],
+    'mitre_cve_res_date': ['cveMetadata.dateReserved'],
+    'mitre_cve_publish_date': ['cveMetadata.datePublished'],
+    'mitre_cve_public_date': ['containers.cna.datePublic'],
+    'cwe_id': ['problemTypes.descriptions.cweId'],
+    'cwe_desc': ['cna.problemTypes.descriptions'],
+    'vendor': ['cna.affected.vendor'],
+    'product': ['cna.affected.product'],
+    'prod_status': ['cna.affected.versions.status'],
+    'prod_defaultStatus': ['cna.affected.defaultStatus'],
+    'prod_version': ['cna.affected.versions.version'],
+    'prod_version_type': ['adp.affected.versions.versionType'],
+    'prod_lessThan': ['adp.affected.versions.lessThan'],
+    'prod_lessThanOrEqual': ['adp.affected.versions.lessThanOrEqual'],
+    'solution': ['cna.solutions.value'],
+    'cve_discovery': ['cna.source.discovery'],
+    'cpe': ['adp.affected.cpes'],
+    'cvss_v2': ['cna.metrics.cvssV2_0.baseScore'],
+    'cvss_v2_vector': ['cna.metrics.cvssV2_0.vectorString'],
+    'cvss_v3': ['cna.metrics.cvssV3_0.baseScore'],
+    'cvss_v3_vector': ['cna.metrics.cvssV3_0.vectorString'],
+    'cvss_v3_1': ['cna.metrics.cvssV3_1.baseScore'],
+    'cvss_v3_1_vector': ['cna.metrics.cvssV3_1.vectorString'],
+    'cvss_v4': ['cna.metrics.cvssV4_0.baseScore'],
+    'cvss_v4_vector': ['cna.metrics.cvssV4_0.vectorString'],
+    'ssvc_exploitation': ['content.options.Exploitation'],
+    'ssvc_automatable': ['content.options.Automatable'],
+    'ssvc_tech_impact': ['content.options.Technical Impact'],
+    'is_kev': ['metrics.other.type']
+}
 
 CONDITIONAL_CVE_EXTRACTIONS = {
     'cve_desc': {
@@ -288,4 +288,16 @@ CVSS_COL_MAP = { # To be use in compile_cols
     'urgency': ['urgency_v4'],
     'user_interaction': ['user_interaction_v3', 'user_interaction_v4'],
     'value_density': ['value_density_v4']
+}
+
+# § ============================================================================
+# § Mapping to extract PoC data from GitHub database
+# § ============================================================================
+POC_EXTRACTIONS = {
+    'cve_id': ['name'],
+    'poc_creation': ['created_at'],
+    'poc_uploaded': ['uploaded_at'],
+    'poc_forks': ['forks_count'],
+    'poc_visibility': ['visibility'],
+    'poc_topics': ['']
 }

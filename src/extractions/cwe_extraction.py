@@ -1,9 +1,9 @@
-"""
+'''
 This script takes the XML file offered by MITRE as the storehouse for Common
 Weakness Enumeration (CWE) information and extracts data relevant to the
 project's analysis. This data is cleaned and merged into a final dataset form
 via other scripts.
-"""
+'''
 
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -19,7 +19,7 @@ NS = {
 
 
 def parse_xml(file_path: str) -> ET.ElementTree:
-    """Parse the provided XML file and return the ElementTree object."""
+    '''Parse the provided XML file and return the ElementTree object.'''
     try:
         return ET.parse(file_path)
     except Exception as e:
@@ -44,7 +44,7 @@ def get_list_of_att(parent_tag, attribute):
 def extract_cwe_data(
         tree: ET.ElementTree
     ) -> List[Dict[str, Union[str, List[str]]]]:
-    """Extract CWE data from the parsed XML tree."""
+    '''Extract CWE data from the parsed XML tree.'''
     root = tree.getroot()
     data = []
     weaknesses = root.findall('.//ns:Weakness', NS)
@@ -152,9 +152,9 @@ def extract_applicable_platform_data(tree: ET.ElementTree) -> pd.DataFrame:
 def to_dataframe(
         data: List[Dict[str, Union[str, List[str]]]]
     ) -> pd.DataFrame:
-    """
+    '''
     Process the extracted CWE data and convert it into a Pandas DataFrame.
-    """
+    '''
     return pd.DataFrame(data)
 
 def run_cwe_extraction(
@@ -162,7 +162,7 @@ def run_cwe_extraction(
         output_file: str,
         file_format: str='parquet'
     ):
-    """Orchestrate the parsing, extraction, and saving of CWE data."""
+    '''Orchestrate the parsing, extraction, and saving of CWE data.'''
     tree = parse_xml(input_file)
     extracted_data = extract_cwe_data(tree)
     df = to_dataframe(extracted_data)

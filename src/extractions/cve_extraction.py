@@ -224,7 +224,7 @@ def run_cve_extraction(
         base_dir: str,
         output_file: str,
         file_format: str='parquet'
-    ):
+    ) -> None:
     ''' Run CVE data extraction '''
     # Capture invalid input
     if not os.path.isdir(base_dir):

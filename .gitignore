@@ -5,6 +5,8 @@
 data/raw/*
 data/intermediate/*
 data/defunct/*
+data/processed/*
+!data/processed/*.csv
 
 # Ignore checkpoint and cache files
 .ipynb_checkpoints/
