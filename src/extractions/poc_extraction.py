@@ -100,6 +100,20 @@ def deep_search(data: Union[Dict, List], target_keys: List[str]) -> Any:
     for key_path in target_keys:
         recursive_search(data, key_path.split('.'))
 
+        # Flatten lists to ensure multiple matches are combined
+    flattened_results = []
+    for result in results:
+        if isinstance(result, list):
+            flattened_results.extend(result)
+        else:
+            flattened_results.append(result)
+
+    # Return as-is if the original target is a list
+    return (
+        flattened_results if any(isinstance(data, list)
+        for data in results) else results[0] if results else None
+    )
+
     return results[0] if results else None
 
 def log_progress(progress: int, total_files: int, start_time: float) -> None:

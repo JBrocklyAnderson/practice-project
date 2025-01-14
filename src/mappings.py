@@ -296,8 +296,8 @@ CVSS_COL_MAP = { # To be use in compile_cols
 POC_EXTRACTIONS = {
     'cve_id': ['name'],
     'poc_creation': ['created_at'],
-    'poc_uploaded': ['uploaded_at'],
+    'poc_uploaded': ['pushed_at'],
     'poc_forks': ['forks_count'],
     'poc_visibility': ['visibility'],
-    'poc_topics': ['']
+    'poc_topics': ['topics']
 }

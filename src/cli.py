@@ -1,9 +1,9 @@
-"""
+'''
 This module builds the project's command-line interface, e.g. the means by which
 users can interact with the various scripts in order to perform specific
 operations at a modular level without running the entire codebase every time
 they execute a single section of the code.
-"""
+'''
 
 import argparse
 from extractions.cve_extraction import run_cve_extraction
@@ -12,7 +12,7 @@ from extractions.cwe_extraction import run_cwe_extraction
 # from extractions.epss_extraction import run_epss_extraction
 # from extractions.exploit_db_extraction import run_xdb_extraction
 # from extractions.poc_extraction import run_xdb_extraction
-
+from extractions.poc_extraction import run_poc_extraction
 from preprocessing.cve_preprocessing import run_cve_preprocessing
 from preprocessing.cwe.cwe_preprocessing import run_cwe_preprocessing
 from preprocessing.cwe.related_cwe_preprocessing import run_related_cwe_preprocessing
@@ -27,9 +27,9 @@ from preprocessing.cwe.cwe_mitigation_preprocessing import run_cwe_mitigation_pr
 from preprocessing.kev_preprocessing import run_kev_preprocessing
 
 def def_args():
-    """
+    '''
     Construct command-line arguments to run the project pipeline.
-    """
+    '''
     # Start the argument parser
     parser = argparse.ArgumentParser(
         description='Patch Prioritization Analysis Pipeline'
@@ -255,9 +255,9 @@ def def_args():
     return parser.parse_args()
 
 def run_tasks(args):
-    """
+    '''
     Handle arguments given through the command line.
-    """
+    '''
     # Handle all tasks
     if args.run_all:
         print('Running all tasks...\n')
@@ -327,7 +327,7 @@ def run_tasks(args):
         input_dir = args.poc_input or 'data/raw/exploits/poc/PoC-in-GitHub' # !TBD
         output_file = args.poc_output or f'data/intermediate/exploits/poc/poc_extracted.{file_format}'
         print('Extracting proof-of-concept data from GitHub...\n')
-        # run_poc_extraction(input_dir, output_file, file_format)
+        run_poc_extraction(input_dir, output_file, file_format)
 
     # § Handle preprocessing
     if args.preprocess_cve:

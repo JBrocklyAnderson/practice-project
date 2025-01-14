@@ -1,4 +1,4 @@
-"""
+'''
 This module is responsible for cleaning CISA's KEV Catalog, which contains the
 exploited vulnerabilities that the project uses to call data from the NVD,
 FIRST, and ExploitDB. The Cybersecurity and Infrastructure Security Agency
@@ -24,7 +24,7 @@ Steps required:
 5. Standardize null values (None, '', NaN, etc.) into pd.NA values ✅
 6. Remedy typos/redundancies (as much as possible). ✅
 7. Remove/impute missing values (if necessary). ✅
-"""
+'''
 
 import pandas as pd
 from utils import convert_cols, standardize_nulls, save_data
