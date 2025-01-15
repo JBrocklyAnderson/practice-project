@@ -594,25 +594,48 @@ def inspect_col_items(df: pd.DataFrame, col: str, start=0, end=None) -> None:
                 f'Col: {col} | Row {idx} | Data: {cell} | Type: {type(cell)}'
             )
 
-def validate_cve_id(cve_id):
+def validate_cve_id(primary: str, backup: Union[str, List[str]]=None) -> str:
     '''
-    Validates and formats CVE IDs to follow 'CVE-YYYY-XXXXXXX'.
+    Validates and formats CVE IDs to follow 'CVE-YYYY-XXXXXXX' by attempting to
+    remedy a variety of potential malformations.
+    Args:
+        cve_id (str): The CVE ID to validate and format
+        backup (str or List[str]): Alternative CVE ID location to check if main
+            is empty
+    Returns: A validated CVE ID string
     '''
     # Regex pattern for CVE ID
-    pattern = r'^CVE-(1999|20[0-9]{2})-(\d{4,7})$'
+    pattern = r'(?i)CVE-(1999|20[0-9]{2})-(\d{4,7})'
+    primary = str(primary)
     # Check if CVE ID matches the pattern
-    match = re.match(pattern, cve_id)
+    match = re.match(pattern, primary)
     if match:
-        return cve_id  # Valid format, return as is
+        return primary # Valid format, return as is
     # Try to fix common issues (e.g., missing 'CVE-', extra spaces, lowercase)
     try:
         # Extract digits and check the format
-        fixed_id = re.sub(r'\s+', '', str(cve_id))
+        fixed_id = re.sub(r'\s+', '', primary)
         fixed_id = fixed_id.upper()
         fixed_id = re.sub(r'^([0-9]{4})-([0-9]+)$', r'CVE-\1-\2', fixed_id)
+
+        # Check if ordinal section of ID needs zero-padding
+        if re.match(r'(?i)CVE-(1999|20[0-9]{2})-(\d+)'):
+            year, ordinal = fixed_id.split('-')[1:]
+            fixed_ordinal = ordinal.zfill(4)
+            fixed_id = f'CVE-{year}-{fixed_ordinal}'
+
+        # Check if ID matches the pattern after fixing
         if re.match(pattern, fixed_id):
             return fixed_id
     except:
         pass
-    # If the ID is invalid and cannot be fixed, return NaN
+    # If the ID is still invalid, look through the backup
+    if backup and isinstance(backup, (list, np.ndarray)):
+        for item in backup:
+            item = str(item).strip()
+            backup_match = re.search(pattern, item)
+            if backup_match:
+                year, ordinal = backup_match.split('-')[1:]
+                fixed_ordinal = ordinal.zfill(4)
+                return f'CVE-{year}-{fixed_ordinal}'
     return pd.NA
