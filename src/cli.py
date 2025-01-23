@@ -26,7 +26,7 @@ from preprocessing import (
     # run_epss_preprocessing,
     # run_nvd_preprocessing,
     # run_xdb_preprocessing,
-    # run_poc_preprocessing,
+    run_poc_preprocessing,
     run_kev_preprocessing,
 )
 
@@ -404,7 +404,7 @@ def run_tasks(args):
 
     if args.preprocess_poc:
         file_format = args.poc_format or 'parquet'
-        input_file = args.poc_input or 'data/intermediate/exploits/poc/poc_in_github_extracted.parquet'
+        input_file = args.poc_input or 'data/intermediate/exploits/poc/poc_extracted.parquet'
         output_file = args.poc_output or f'data/processed/exploits/poc/poc_cleaned.{file_format}'
         print("Preprocessing GitHub's proof-of-concept data...\n")
         run_poc_preprocessing(input_file, output_file, file_format)

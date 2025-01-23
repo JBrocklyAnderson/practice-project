@@ -162,7 +162,7 @@ def compile_cols(
         source_suffix: str='_src'
     ) -> pd.DataFrame:
     '''
-    Consolidates version-specific columns into single un1ified columns.
+    Consolidates version-specific columns into single unified columns.
     Args:
         df (pd.DataFrame): The DataFrame containing version-specific columns.
         column_mapping (Dict[str, List[str]]): A dictionary mapping unified
@@ -214,7 +214,7 @@ def concat_col(
         sep: str=' '
     ) -> pd.DataFrame:
     '''
-    Concatenates all strings in lists within the DataFrame colum.
+    Concatenates all strings in lists within the DataFrame column.
     Args:
         df (pd.DataFrame): The DataFrame to process.
         col (str): The column whose lists need concatenation.
@@ -608,9 +608,9 @@ def validate_cve_id(primary: str, backup: Union[str, List[str]]=None) -> str:
     pattern = r'(?i)CVE-(1999|20[0-9]{2})-(\d{4,7})'
     primary = str(primary)
     # Check if CVE ID matches the pattern
-    match = re.match(pattern, primary)
+    match = re.search(pattern, primary)
     if match:
-        return primary # Valid format, return as is
+        return match.group(0).upper() # Valid format, return as is
     # Try to fix common issues (e.g., missing 'CVE-', extra spaces, lowercase)
     try:
         # Extract digits and check the format
@@ -620,22 +620,22 @@ def validate_cve_id(primary: str, backup: Union[str, List[str]]=None) -> str:
 
         # Check if ordinal section of ID needs zero-padding
         if re.match(r'(?i)CVE-(1999|20[0-9]{2})-(\d+)'):
-            year, ordinal = fixed_id.split('-')[1:]
+            year, ordinal = fixed_id.group(0).split('-')[1:]
             fixed_ordinal = ordinal.zfill(4)
             fixed_id = f'CVE-{year}-{fixed_ordinal}'
 
         # Check if ID matches the pattern after fixing
-        if re.match(pattern, fixed_id):
+        if re.search(pattern, fixed_id):
             return fixed_id
     except:
         pass
     # If the ID is still invalid, look through the backup
-    if backup and isinstance(backup, (list, np.ndarray)):
+    if isinstance(backup, (list, np.ndarray)) and len(backup) > 0:
         for item in backup:
             item = str(item).strip()
             backup_match = re.search(pattern, item)
             if backup_match:
-                year, ordinal = backup_match.split('-')[1:]
+                year, ordinal = backup_match.group(0).split('-')[1:]
                 fixed_ordinal = ordinal.zfill(4)
                 return f'CVE-{year}-{fixed_ordinal}'
     return pd.NA

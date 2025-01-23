@@ -268,6 +268,7 @@ CVSS_COL_MAP = { # To be use in compile_cols
         'confidentiality_requirement_v4'
     ],
     'cvss': ['cvss_v2', 'cvss_v3', 'cvss_v4'],
+    'cvss_severity': ['cvss_v2_severity', 'cvss_v3_severity', 'cvss_v4_severity'],
     'exploit_maturity': ['exploit_maturity_v3', 'exploit_maturity_v4'],
     'integrity': ['integrity_v2', 'integrity_v3', 'vuln_sys_integrity_v4'],
     'integrity_requirement': [

@@ -4,12 +4,8 @@ CWE data within the 'cwe_preprocessing' script.
 """
 
 import pandas as pd
-import numpy as np
 from utils import (
-    concat_col,
     convert_cols,
-    extract_and_explode,
-    flatten_cols,
     save_data,
     standardize_nulls,
     strip_whitespace_from
