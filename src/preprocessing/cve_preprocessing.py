@@ -20,11 +20,12 @@ Steps required:
 # * Compile CVSS score columns and flag their origins
 # * Discover and correct the index misalignment that occurs when dropping
 # *     rejected CVEs
+# TODO: Filter CVEs for those related to energy and industrial SCADA systems
 '''
 
 import pandas as pd
 import numpy as np
-from mappings import CVSS_COL_MAP
+from mappings import CVSS_COL_MAP, CS_SCADA_KEYWORDS, CI_SCADA_KEYWORDS
 from utils import (
     compile_cols,
     concat_col,
@@ -32,6 +33,7 @@ from utils import (
     extract_cvss_metrics,
     extract_cvss_severity,
     extract_max_cvss_score_and_vector,
+    filter_cves,
     flatten_cols,
     save_data,
     safely_drop_duplicates,
@@ -171,6 +173,10 @@ CATEGORY_MAP = {
         'Critical': 'CRITICAL',
     }
 }
+
+KEYWORDS = [
+    ''
+]
 
 def run_cve_preprocessing(
         input_file: str,
@@ -336,6 +342,9 @@ def run_cve_preprocessing(
     # Drop duplicates
     df = safely_drop_duplicates(df)
     print('Dropped duplicates!\n')
+
+    # Filter CVEs for ICS/SCADA-related vulnerabilities
+    df = filter_cves(df, 'cve_desc', CS_SCADA_KEYWORDS, CI_SCADA_KEYWORDS)
 
     # Convert columns to the specified types
     df = convert_cols(df, COL_TYPES)

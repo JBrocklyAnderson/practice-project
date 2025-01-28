@@ -5,7 +5,7 @@ extraction and preprocessing steps.
 # § ============================================================================
 # § Mappings to extract CVE data
 # § ============================================================================
-CVE_EXTRACTIONS = {
+CVE_EXTRACTIONS = { # Datapoints to grab from MITRE's CVE data
     'cve_id': ['cveMetadata.cveId'],
     'cve_desc': ['cna.descriptions.value'],
     'cve_state': ['cveMetadata.state'],
@@ -39,7 +39,7 @@ CVE_EXTRACTIONS = {
     'is_kev': ['metrics.other.type']
 }
 
-CONDITIONAL_CVE_EXTRACTIONS = {
+CONDITIONAL_CVE_EXTRACTIONS = { # Datapoints that require conditional logic
     'cve_desc': {
         'paths': ['cna.descriptions'],
         'condition': lambda _, full_data: [
@@ -62,6 +62,105 @@ CONDITIONAL_CVE_EXTRACTIONS = {
         'condition': lambda value, _: value == 'kev'
     }
 }
+
+CS_SCADA_KEYWORDS = [ # Keywords to search for in CVE descriptions
+    # § Concepts
+    'ED SCADA',
+    
+    # § Hardware
+    'EMS',
+    'ICS', # Also matches 'Ipswitch Collaboration Suite', CVE-2005-0707
+    'PLC',
+
+    # § Protocols
+    'HDLC',
+    'OPC',
+    'OPC UA',
+    'T101',
+
+    # § Manufacturers
+    'ABB',
+    'GE',
+]
+
+CI_SCADA_KEYWORDS = [
+    # § Concepts
+    'advanced metering',
+    'advanced metering infrastructure',
+    'automation of distribution networks',
+    'electric distribution SCADA',
+    'energy distribution',
+    'grid automation',
+    'grid monitoring',
+    'industrial automation',
+    'realtime monitoring',
+    'real-time monitoring',
+    'real time monitoring',
+    'supervisory control and data acquisition',
+    'SCADA',
+    'substation automation',
+    'transmission and distribution',
+    'T&D',
+    
+    # § Hardware
+    'critical infrastructure',
+    'cyber-physical system',
+    'cyber physical system',
+    'distribution management system',
+    'energy management system',
+    'electric power grid',
+    'electric power system',
+    'industrial control system',
+    'master station',
+    'power system',
+    'power grid',
+    'power protection system',
+    'power control',
+    'programmable logic controller',
+    'protection and control system',
+    'remote telemetry unit'
+    'remote terminal unit',
+    'remote terminal',
+    'remote telemetry',
+    'smart grid',
+    'smart meter',
+
+    # § Protocols
+    'DNP3',
+    'IEC 60870',
+    'IEC 60870-5-1',
+    'IEC 60870-5-2',
+    'IEC 60870-5-3',
+    'IEC 60870-5-4',
+    'IEC 60870-5-5',
+    'IEC 60870-5-101',
+    'IEC 61850'
+    'IEC 101',
+    'IEC 104',
+    'IEC60870',
+    'IEC60870-5',
+    'IEC60870-5-1',
+    'IEC60870-5-2',
+    'IEC60870-5-3',
+    'IEC60870-5-4',
+    'IEC60870-5-5',
+    'IEC60870-5-101',
+    'IEC61850',
+    'IEC101',
+    'IEC104',
+    'high level data link control',
+    'modbus',
+
+    # § Manufacturers
+    'emerson',
+    'GE digital energy',
+    'general electric',
+    'honeywell',
+    'rockwell',
+    'rockwell automation',
+    'schneider',
+    'siemens'
+]
 
 # § ============================================================================
 # § Mappings to extract CVSS vector features
@@ -239,7 +338,7 @@ TOTAL_CVSS_MAPPINGS = { # For use in extract_cvss_metrics
     }
 }
 
-CVSS_COL_MAP = { # To be use in compile_cols
+CVSS_COL_MAP = { # To be used in compile_cols
     'attack_complexity': [
         'attack_complexity_v2', 'attack_complexity_v3', 'attack_complexity_v4'
     ],
@@ -294,7 +393,7 @@ CVSS_COL_MAP = { # To be use in compile_cols
 # § ============================================================================
 # § Mapping to extract PoC data from GitHub database
 # § ============================================================================
-POC_EXTRACTIONS = {
+POC_EXTRACTIONS = { # Datapoints to grab from GitHub database
     'cve_id': ['name'],
     'poc_creation': ['created_at'],
     'poc_uploaded': ['pushed_at'],

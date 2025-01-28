@@ -10,7 +10,7 @@ from extractions import (
     run_cve_extraction,
     run_cwe_extraction,
     # run_nvd_extraction,
-    # run_epss_extraction,
+    run_epss_extraction,
     # run_xdb_extraction,
     run_poc_extraction
 )
@@ -115,6 +115,10 @@ def def_args():
     )
 
     # § Add input/output arguments for EPSS data
+    parser.add_argument(
+        '--epss-input', action='store', type=str,
+        help='Input file path to CVEs that have PoC exploit code dates.'
+    )
     parser.add_argument(
         '--epss-output', action='store', type=str,
         help='Output file path for EPSS data'
@@ -310,9 +314,10 @@ def run_tasks(args):
 
     if args.extract_epss:
         file_format = args.epss_format or 'parquet'
+        input_file = args.epss_input or 'data/processed/exploits/poc/poc_cleaned.parquet'
         output_file = args.epss_output or f'data/intermediate/first/epss_extracted.{file_format}'
         print('Running EPSS extraction...\n')
-        # run_epss_extraction(output_file, file_format)
+        run_epss_extraction(input_file, output_file, file_format)
 
     if args.extract_nvd:
         file_format = args.nvd_format or 'parquet'

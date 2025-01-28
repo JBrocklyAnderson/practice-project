@@ -225,7 +225,7 @@ def run_cve_extraction(
         output_file: str,
         file_format: str='parquet'
     ) -> None:
-    ''' Run CVE data extraction '''
+    '''Run CVE data extraction.'''
     # Capture invalid input
     if not os.path.isdir(base_dir):
         raise ValueError(f'Base directory does not exist: {base_dir}')

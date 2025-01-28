@@ -13,7 +13,7 @@ from typing import List, Dict, Union
 from mappings import (
     TOTAL_CVSS_MAPPINGS,
     CVSS_BASE_METRICS,
-    CVSS_VERSION_SPECIFIC_METRIC_OVERRIDES,
+    CVSS_VERSION_SPECIFIC_METRIC_OVERRIDES
 )
 
 # § ============================================================================
@@ -401,7 +401,7 @@ def harmonize_list_lengths(
         cols (List[str]): A list of the columns whose lists need equalizing.
         padding: The value to be padded into lists
     Returns:
-        A DataFrame containing row-wise equal-length lists ready for explosion.
+        pd.DataFrame: A DataFrame containing row-wise equal-length lists
     '''
     # Calculate length of longest list in row
     def pad_row(row: List[str]) -> List[str]:
@@ -418,7 +418,7 @@ def harmonize_list_lengths(
     return df.apply(pad_row, axis=1)
 
 # § ============================================================================
-# § CVSS-Specific Processing
+# § CVSS- and CVE-Specific Processing
 # § ============================================================================
 def extract_cvss_metrics(
         df: pd.DataFrame,
@@ -498,6 +498,14 @@ def extract_cvss_severity(
         df: pd.DataFrame,
         score_cols: List[str]
     ) -> pd.DataFrame:
+    '''
+    Uses a DataFrame's CVSS scores to produce categorical severities.
+    Args:
+        df (pd.DataFrame): DataFrame to extract the severity categories.
+        score_cols (List[str]): Columns containing CVSS scores.
+    Returns:
+        pd.DataFrame: A DataFrame containing the severity categories.
+    '''
     def get_severity(score: float, version: str) -> str:
         '''
         Extracts the severity category based on the CVSS version and score.
@@ -505,7 +513,7 @@ def extract_cvss_severity(
             score (float): The CVSS score
             version (str): The CVSS version
         Returns:
-            str: The severity category
+            str: The severity category.
         '''
         if score is None or not isinstance(score, float):
             return np.nan  # Handle missing or invalid scores
@@ -548,14 +556,66 @@ def extract_max_cvss_score_and_vector(
         vector_col: str
     ) -> pd.DataFrame:
     '''
-    Extract the maximum score and its corresponding vector for the specified columns.
-    Overwrites the original columns in the DataFrame.
+    Extract the maximum score and its corresponding vector for the specified
+    columns. Overwrites the original columns in the DataFrame.
+    Args:
+        df (pd.DataFrame): The dataframe from which to extract the maximum score
+            and vector.
+        score_col (str): The column from which to extract the maximum score.
+        vector_col (str): The column from which to extract the vector.
+    Returns:
+        pd.DataFrame: The DataFrame with added maximum score and vector columns.
     '''
     df[score_col], df[vector_col] = zip(*df.apply(
         lambda row: max(zip(row[score_col], row[vector_col]), key=lambda x: x[0]),
         axis=1
     ))
     return df
+
+def filter_cves(
+        df: pd.DataFrame,
+        search_field: str,
+        sensitive_keywords: List[str],
+        insensitive_keywords: List[str]
+    ) -> pd.DataFrame:
+    '''
+    Filters a DataFrame of CVEs based on the existence of at least one keyword
+    in the search field column.
+    Args:
+        df (pd.DataFrame): The DataFrame to filter.
+        search_field (str): The column to search in for keywords.
+        keywords (List[str]): The keywords to look for in the search field.
+    Returns:
+        pd.DataFrame: The filtered DataFrame.
+    '''
+    if search_field not in df.columns:
+        raise ValueError(f'Column "{search_field}" not found in DataFrame.')
+
+    # Build regex patterns for case-sensitive and case-insensitive keywords
+    case_sensitive_pattern = '|'.join(f'\\b{re.escape(kw)}\\b' for kw in sensitive_keywords)
+    case_insensitive_pattern = '|'.join(f'(?i)\\b{re.escape(kw)}\\b' for kw in insensitive_keywords)
+
+    # Define helper functions for matching
+    def find_case_sensitive_match(text: str) -> str:
+        if not isinstance(text, str):
+            return None
+        match = re.search(case_sensitive_pattern, text)
+        return match.group(0) if match else None
+
+    def find_case_insensitive_match(text: str) -> str:
+        if not isinstance(text, str):
+            return None
+        match = re.search(case_insensitive_pattern, text)
+        return match.group(0) if match else None
+
+    # Apply both patterns separately and record the first match
+    df['matched_keyword'] = df[search_field].apply(
+        lambda text: find_case_sensitive_match(text)
+        or find_case_insensitive_match(text)
+    )
+
+    # Filter rows where a match was found
+    return df[df['matched_keyword'].notna()].reset_index(drop=True)
 
 # § ============================================================================
 # § Validation & Inspection
