@@ -9,7 +9,6 @@ import argparse
 from extractions import (
     run_cve_extraction,
     run_cwe_extraction,
-    # run_nvd_extraction,
     run_epss_extraction,
     run_poc_extraction
 )
@@ -23,7 +22,6 @@ from preprocessing import (
     run_cwe_detection_preprocessing,
     run_cwe_mitigation_preprocessing,
     run_epss_preprocessing,
-    # run_nvd_preprocessing,
     run_poc_preprocessing,
     run_kev_preprocessing,
 )
@@ -133,19 +131,6 @@ def def_args():
     )
 
     # § ========================================================================
-    # § Add input/output arguments for NVD data
-    # § ========================================================================
-    parser.add_argument(
-        '--nvd-output', action='store', type=str,
-        help='Output file path for NVD data'
-    )
-    parser.add_argument(
-        '--nvd-format', action='store', type=str, default='parquet',
-        choices=['parquet', 'csv', 'xlsx'],
-        help='File format for saving NVD data'
-    )
-
-    # § ========================================================================
     # § Add input/output arguments for PoC-GitHub data
     # § ========================================================================
     parser.add_argument(
@@ -194,10 +179,6 @@ def def_args():
         help='Extract CWE data from XML'
     )
     parser.add_argument(
-        '--extract-nvd', action='store_true',
-        help='Extract data from the NVD API'
-    )
-    parser.add_argument(
         '--extract-epss', action='store_true',
         help='Extract data from the FIRST API'
     )
@@ -242,10 +223,6 @@ def def_args():
         help='Clean and preprocess extracted EPSS data'
     )
     parser.add_argument(
-        '--preprocess-nvd', action='store_true',
-        help='Clean and preprocess extracted NVD data'
-    )
-    parser.add_argument(
         '--preprocess-poc', action='store_true',
         help='Clean and preprocess extracted PoC-in-GitHub data'
     )
@@ -280,7 +257,6 @@ def run_tasks(args):
         # Run EPSS Extraction
         # Run CVE Cleanup
         # Run CWE Cleanup
-        # Run NVD Cleanup
         # Run EPSS Cleanup
         # Run data marge
 
@@ -314,12 +290,6 @@ def run_tasks(args):
         output_file = args.epss_output or f'data/intermediate/first/epss_extracted.{file_format}'
         print('Running EPSS extraction...\n')
         run_epss_extraction(input_file, output_file, file_format)
-
-    if args.extract_nvd:
-        file_format = args.nvd_format or 'parquet'
-        output_file = args.nvd_output or f'data/intermediate/nvd/nvd_extracted.{file_format}'
-        print('Extracting data from the NVD...\n')
-        # run_nvd_extraction(output_file, file_format)
 
     if args.extract_poc:
         file_format = args.poc_format or 'parquet'
@@ -387,12 +357,6 @@ def run_tasks(args):
         output_file = args.cwe_output or f'data/processed/mitre/cwe/cwe_cleaned.{file_format}'
         print('Preprocessing EPSS data...\n')
         run_epss_preprocessing(input_file, output_file, file_format)
-
-    if args.preprocess_nvd:
-        file_format = args.cwe_format or 'parquet'
-        output_file = args.cwe_output or f'data/processed/mitre/cwe/cwe_cleaned.{file_format}'
-        print('Preprocessing NVD data...\n')
-        run_nvd_preprocessing(input_file, output_file, file_format)
 
     if args.preprocess_poc:
         file_format = args.poc_format or 'parquet'
