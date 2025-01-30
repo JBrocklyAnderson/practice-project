@@ -43,8 +43,9 @@ def def_args():
         '--run-all', action='store_true',
         help='Run all tasks in the pipeline'
     )
-
+    # § ========================================================================
     # § Add input/output arguments for CVE data
+    # § ========================================================================
     parser.add_argument(
         '--cve-input', action='store', type=str,
         help='Path to directory of JSON files from which to extract CVE data'
@@ -59,7 +60,9 @@ def def_args():
         help='File format to save CVE data'
     )
 
+    # § ========================================================================
     # § Add input/output arguments for CWE data
+    # § ========================================================================
     parser.add_argument(
         '--cwe-input', action='store', type=str,
         help='Path to XML file from which to extract CWE data'
@@ -114,7 +117,9 @@ def def_args():
         help='Output file path for CWE Mitigation table data'
     )
 
+    # § ========================================================================
     # § Add input/output arguments for EPSS data
+    # § ========================================================================
     parser.add_argument(
         '--epss-input', action='store', type=str,
         help='Input file path to CVEs that have PoC exploit code dates.'
@@ -129,7 +134,9 @@ def def_args():
         help='File format for saving EPSS data'
     )
 
+    # § ========================================================================
     # § Add input/output arguments for NVD data
+    # § ========================================================================
     parser.add_argument(
         '--nvd-output', action='store', type=str,
         help='Output file path for NVD data'
@@ -140,18 +147,9 @@ def def_args():
         help='File format for saving NVD data'
     )
 
-    # § Add input/output arguments for ExploitDB data
-    parser.add_argument(
-        '--xdb-output', action='store', type=str,
-        help='Output file path for ExploitDB data'
-    )
-    parser.add_argument(
-        '--xdb-format', action='store', type=str, default='parquet',
-        choices=['parquet', 'csv', 'xlsx'],
-        help='File format for saving ExploitDB data'
-    )
-
+    # § ========================================================================
     # § Add input/output arguments for PoC-GitHub data
+    # § ========================================================================
     parser.add_argument(
         '--poc-input', action='store', type=str,
         help='Path to directory of JSON files from which to extract CVE data'
@@ -166,7 +164,9 @@ def def_args():
         help='File format to save CVE data'
     )
 
+    # § ========================================================================
     # § Add input/output arguments for KEV
+    # § ========================================================================
     parser.add_argument(
         '--kev-input', action='store', type=str, help='Path to KEV catalog'
     )
@@ -180,7 +180,9 @@ def def_args():
         help='File format for saving KEV data'
     )
 
+    # § ========================================================================
     # § Extraction operations
+    # § ========================================================================
     parser.add_argument(
         '--extract-cve', action='store_true',
         help='Extract CVE data from MITRE database'
@@ -202,15 +204,13 @@ def def_args():
         help='Extract data from the FIRST API'
     )
     parser.add_argument(
-        '--extract-xdb', action='store_true',
-        help='Run an extraction for data from Exploit DB'
-    )
-    parser.add_argument(
         '--extract-poc', action='store_true',
         help='Extract data from the KEV catalog'
     )
 
+    # § ========================================================================
     # § Preprocessing operations
+    # § ========================================================================
     parser.add_argument(
         '--preprocess-cve', action='store_true',
         help='Clean and preprocess extracted CVE data'
@@ -246,10 +246,6 @@ def def_args():
     parser.add_argument(
         '--preprocess-nvd', action='store_true',
         help='Clean and preprocess extracted NVD data'
-    )
-    parser.add_argument(
-        '--preprocess-xdb', action='store_true',
-        help='Clean and preprocess extracted ExploitDB data'
     )
     parser.add_argument(
         '--preprocess-poc', action='store_true',
@@ -290,7 +286,9 @@ def run_tasks(args):
         # Run EPSS Cleanup
         # Run data marge
 
+    # § ========================================================================
     # § Handle extractions
+    # § ========================================================================
     if args.extract_cve:
         file_format = args.cve_format or 'parquet'
         input_dir = args.cve_input or 'data/raw/mitre/cve/cvelistV5/cves'
@@ -325,12 +323,6 @@ def run_tasks(args):
         print('Extracting data from the NVD...\n')
         # run_nvd_extraction(output_file, file_format)
 
-    if args.extract_xdb:
-        file_format = args.xdb_format or 'parquet'
-        output_file = args.xdb_output or f'data/intermediate/exploits/xdb/xdb_extracted.{file_format}'
-        print('Extracting data from ExploitDB...\n')
-        # run_xdb_extraction(output_file, file_format)
-
     if args.extract_poc:
         file_format = args.poc_format or 'parquet'
         input_dir = args.poc_input or 'data/raw/exploits/poc/PoC-in-GitHub'
@@ -338,7 +330,9 @@ def run_tasks(args):
         print('Extracting proof-of-concept data from GitHub...\n')
         run_poc_extraction(input_dir, output_file, file_format)
 
+    # § ========================================================================
     # § Handle preprocessing
+    # § ========================================================================
     if args.preprocess_cve:
         file_format = args.cve_format or 'parquet'
         input_file = args.cve_input or 'data/intermediate/mitre/cve/cve_extracted.parquet'
@@ -400,12 +394,6 @@ def run_tasks(args):
         output_file = args.cwe_output or f'data/processed/mitre/cwe/cwe_cleaned.{file_format}'
         print('Preprocessing NVD data...\n')
         run_nvd_preprocessing(input_file, output_file, file_format)
-
-    if args.preprocess_xdb:
-        file_format = args.xdb_format or 'parquet'
-        output_file = args.xdb_output or f'data/processed/exploits/xdb/xdb_cleaned.{file_format}'
-        print('Preprocessing ExploitDB data...\n')
-        run_xdb_preprocessing(input_file, output_file, file_format)
 
     if args.preprocess_poc:
         file_format = args.poc_format or 'parquet'

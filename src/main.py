@@ -11,8 +11,8 @@ of this data into a format better suited for robust analysis.
 # * CWE Platform Extraction
 # TODO: EPSS Extraction
 # TODO: NVD Extraction
-# TODO: ExploitDB Extraction
-# TODO: PoC-in-GitHub Extraction
+# * ExploitDB Extraction
+# * PoC-in-GitHub Extraction
 # * CVE Preprocessing
 # * CWE Preprocessing
 # * CWE Platform Extraction
@@ -27,8 +27,8 @@ of this data into a format better suited for robust analysis.
 # * Related CWE Preprocessing
 # TODO: EPSS Preprocessing
 # TODO: NVD Processing
-# TODO: ExploitDB Preprocessing
-# TODO: PoC-in-GitHub Preprocessing
+# * ExploitDB Preprocessing
+# * PoC-in-GitHub Preprocessing
 # * KEV Preprocessing
 # TODO: Data Merge and Postprocessing
 
