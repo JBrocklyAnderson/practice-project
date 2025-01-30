@@ -11,7 +11,6 @@ from extractions import (
     run_cwe_extraction,
     # run_nvd_extraction,
     run_epss_extraction,
-    # run_xdb_extraction,
     run_poc_extraction
 )
 
@@ -23,9 +22,8 @@ from preprocessing import (
     run_cwe_consequence_preprocessing,
     run_cwe_detection_preprocessing,
     run_cwe_mitigation_preprocessing,
-    # run_epss_preprocessing,
+    run_epss_preprocessing,
     # run_nvd_preprocessing,
-    # run_xdb_preprocessing,
     run_poc_preprocessing,
     run_kev_preprocessing,
 )
@@ -385,6 +383,7 @@ def run_tasks(args):
 
     if args.preprocess_epss:
         file_format = args.cwe_format or 'parquet'
+        input_file = args.epss_input or 'data/intermediate/first/epss_extracted.parquet'
         output_file = args.cwe_output or f'data/processed/mitre/cwe/cwe_cleaned.{file_format}'
         print('Preprocessing EPSS data...\n')
         run_epss_preprocessing(input_file, output_file, file_format)

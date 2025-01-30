@@ -273,7 +273,7 @@ def convert_cols(
                         df[col] = df[col].astype('Float64')
                         print(f'{col} converted to float!')
                     elif dtype.lower() in [
-                        'datetime', 'datetime64', 'dt', 'dt64'
+                        'datetime', 'datetime64', 'dt', 'dt64', 'date'
                     ]:
                         df[col] = pd.to_datetime(
                             df[col], format='mixed', utc=True

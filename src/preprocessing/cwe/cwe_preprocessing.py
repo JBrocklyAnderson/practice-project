@@ -48,7 +48,7 @@ def run_cwe_preprocessing(
         input_file: str,
         output_file: str,
         file_format: str='parquet'
-    ):
+    ) -> None:
     # Load the CWE file
     df = pd.read_parquet(path=input_file)
     # Convert datatypes

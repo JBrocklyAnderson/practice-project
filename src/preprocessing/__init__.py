@@ -1,6 +1,5 @@
 from .cve_preprocessing import run_cve_preprocessing
-# from .epss_preprocessing import run_epss_preprocessing
-# from .exploit_db_preprocessing import run_exploit_db_preprocessing
+from .epss_preprocessing import run_epss_preprocessing
 from .kev_preprocessing import run_kev_preprocessing
 # from .nvd_preprocessing import run_nvd_preprocessing
 from .poc_preprocessing import run_poc_preprocessing

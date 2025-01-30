@@ -54,7 +54,7 @@ def extract_epss(
                 missing_data.append({
                     'cve_id': cve,
                     'date': query_date,
-                    'reason': 'No EPSS score found in valid response.'
+                    'reason': 'No records available.'
                 })
         except requests.exceptions.RequestException as e:
             missing_data.append({'cve_id': cve, 'date': query_date, 'reason': str(e)})
