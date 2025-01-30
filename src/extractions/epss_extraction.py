@@ -33,7 +33,7 @@ def extract_epss(
 
     for cve, date in zip(cves, dates):
         # Take the date before the CVE's first PoC exploit code was published
-        query_date = (date - timedelta(days=1)).strftime('%Y-%m-%d')
+        query_date = date.strftime('%Y-%m-%d')
         url = f'{base_url}?cve={cve}&date={query_date}&pretty=true'
         print(f'Called with URL : {url}')
 
@@ -79,6 +79,7 @@ def run_epss_extraction(
     '''
     # Load the CVEs
     input_data = pd.read_parquet(path=input_file)
+    input_data = input_data.dropna(subset=['earliest_date'])
     cves = input_data['cve_id'].tolist()
     dates = pd.to_datetime(input_data['earliest_date']).tolist()
     base_url = 'https://api.first.org/data/v1/epss'
