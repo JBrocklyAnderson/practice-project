@@ -1,6 +1,9 @@
 # Patch Prioritization Analysis
 <span style='font-weight:900;color:#ff9900;text-shadow:0 0 5px #ffff00;'>PENDING README</span>
 
+The last time MITRE's CVE Project filebase was pulled into the local repository
+from which this project extracts crucial CVE data was Wednesday, December 11,
+2024 at 04:40:57.
 
 ## Data Sources
 ### MITRE

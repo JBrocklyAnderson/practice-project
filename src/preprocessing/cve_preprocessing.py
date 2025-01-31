@@ -344,7 +344,7 @@ def run_cve_preprocessing(
     print('Dropped duplicates!\n')
 
     # Filter CVEs for ICS/SCADA-related vulnerabilities
-    df = filter_cves(df, 'cve_desc', CS_SCADA_KEYWORDS, CI_SCADA_KEYWORDS)
+    # df = filter_cves(df, 'cve_desc', CS_SCADA_KEYWORDS, CI_SCADA_KEYWORDS)
 
     # Convert columns to the specified types
     df = convert_cols(df, COL_TYPES)

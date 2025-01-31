@@ -6,6 +6,7 @@ they execute a single section of the code.
 '''
 
 import argparse
+from compilation import run_data_compilation
 from extractions import (
     run_cve_extraction,
     run_cwe_extraction,
@@ -164,6 +165,19 @@ def def_args():
     )
 
     # § ========================================================================
+    # § Add input/output arguments for data compilation
+    # § ========================================================================
+    parser.add_argument(
+        '--compile-output', action='store', type=str,
+        help='Output file path for data compilation'
+    )
+    parser.add_argument(
+        '--compile-format', action='store', type=str, default='parquet',
+        choices=['parquet', 'csv', 'xlsx'],
+        help='File format for saving compiled data'
+    )
+
+    # § ========================================================================
     # § Extraction operations
     # § ========================================================================
     parser.add_argument(
@@ -229,6 +243,14 @@ def def_args():
     parser.add_argument(
         '--preprocess-kev', action='store_true',
         help='Clean and preprocess KEV dataset'
+    )
+
+    # § ========================================================================
+    # § Composite operations
+    # § ========================================================================
+    parser.add_argument(
+        '--compile-data', action='store_true',
+        help='Compile extracted and preprocessed data'
     )
 
     return parser.parse_args()
@@ -352,9 +374,9 @@ def run_tasks(args):
         run_cwe_mitigation_preprocessing(input_file, output_file, file_format)
 
     if args.preprocess_epss:
-        file_format = args.cwe_format or 'parquet'
+        file_format = args.epss_format or 'parquet'
         input_file = args.epss_input or 'data/intermediate/first/epss_extracted.parquet'
-        output_file = args.cwe_output or f'data/processed/mitre/cwe/cwe_cleaned.{file_format}'
+        output_file = args.epss_output or f'data/processed/first/epss_cleaned.{file_format}'
         print('Preprocessing EPSS data...\n')
         run_epss_preprocessing(input_file, output_file, file_format)
 
@@ -371,3 +393,12 @@ def run_tasks(args):
         output_file = args.kev_output or f'data/processed/cisa/kev/kev_processed.{file_format}'
         print('Preprocessing KEV catalog...\n')
         run_kev_preprocessing(input_file, output_file, file_format)
+
+    # § ========================================================================
+    # § Handle compilation
+    # § ========================================================================
+    if args.compile_data:
+        file_format = args.compile_format or 'parquet'
+        output_file = args.compile_output or f'data/processed/composite/dataset_large.{file_format}'
+        print('Compiling data...\n')
+        run_data_compilation(output_file, file_format)

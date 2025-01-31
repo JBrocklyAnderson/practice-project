@@ -2,11 +2,8 @@
 *.env
 
 # Ignore unnecessary data
-data/raw/*
-data/intermediate/*
-data/defunct/*
-data/processed/*
-!data/processed/*.csv
+data/**
+!data/processed/**/*.csv
 
 # Ignore checkpoint and cache files
 .ipynb_checkpoints/

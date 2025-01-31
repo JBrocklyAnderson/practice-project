@@ -1,4 +1,4 @@
-"""
+'''
 This script cleans and processes the CWE data scraped from MITRE's XML sheet. At
 the same time, it extracts multiple subtables from that enable the project to
 analyze various relationships by exploding lists without producing cartesian
@@ -21,7 +21,7 @@ Steps required:
 - Standardize null values (None, '', NaN, etc.) into pd.NA values ✅
 - Extract sub-tables and explode them into long format after standardizing their
     list lengths ✅
-"""
+'''
 
 import pandas as pd
 import numpy as np
