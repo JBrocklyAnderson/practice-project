@@ -11,7 +11,8 @@ from extractions import (
     run_cve_extraction,
     run_cwe_extraction,
     run_epss_extraction,
-    run_poc_extraction
+    run_poc_extraction,
+    run_nvd_extraction
 )
 
 from preprocessing import (
@@ -25,6 +26,7 @@ from preprocessing import (
     run_epss_preprocessing,
     run_poc_preprocessing,
     run_kev_preprocessing,
+    run_nvd_preprocessing
 )
 
 def def_args():
@@ -165,6 +167,22 @@ def def_args():
     )
 
     # § ========================================================================
+    # § Add input/output arguments for NVD
+    # § ========================================================================
+    parser.add_argument(
+        '--nvd-input', action='store', type=str, help='Path to NVD data'
+    )
+    parser.add_argument(
+        '--nvd-output', action='store', type=str,
+        help='Output file path for NVD data'
+    )
+    parser.add_argument(
+        '--nvd-format', action='store', type=str, default='parquet',
+        choices=['parquet', 'csv', 'xlsx'],
+        help='File format for saving NVD data'
+    )
+
+    # § ========================================================================
     # § Add input/output arguments for data compilation
     # § ========================================================================
     parser.add_argument(
@@ -199,6 +217,10 @@ def def_args():
     parser.add_argument(
         '--extract-poc', action='store_true',
         help='Extract data from the KEV catalog'
+    )
+    parser.add_argument(
+        '--extract-nvd', action='store_true',
+        help='Extract NVD data from NIST'
     )
 
     # § ========================================================================
@@ -243,6 +265,10 @@ def def_args():
     parser.add_argument(
         '--preprocess-kev', action='store_true',
         help='Clean and preprocess KEV dataset'
+    )
+    parser.add_argument(
+        '--preprocess-nvd', action='store_true',
+        help='Clean and preprocess NVD dataset'
     )
 
     # § ========================================================================
@@ -320,6 +346,12 @@ def run_tasks(args):
         print('Extracting proof-of-concept data from GitHub...\n')
         run_poc_extraction(input_dir, output_file, file_format)
 
+    if args.extract_nvd:
+        file_format = args.nvd_format or 'parquet'
+        output_file = args.nvd_output or f'data/raw/nvd/nvd_extracted.{file_format}'
+        print('Extracting NVD data from NIST...\n')
+        run_nvd_extraction(output_file, file_format)
+
     # § ========================================================================
     # § Handle preprocessing
     # § ========================================================================
@@ -393,6 +425,13 @@ def run_tasks(args):
         output_file = args.kev_output or f'data/processed/cisa/kev/kev_processed.{file_format}'
         print('Preprocessing KEV catalog...\n')
         run_kev_preprocessing(input_file, output_file, file_format)
+
+    if args.preprocess_nvd:
+        file_format = args.nvd_format or 'parquet'
+        input_file = args.nvd_input or 'data/raw/nvd/nvd_extracted.parquet'
+        output_file = args.nvd_output or f'data/processed/nvd/nvd_cleaned.{file_format}'
+        print('Preprocessing NVD data...\n')
+        run_nvd_preprocessing(input_file, output_file, file_format)
 
     # § ========================================================================
     # § Handle compilation
