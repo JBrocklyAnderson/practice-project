@@ -30,36 +30,43 @@ def extract_epss(
     missing_data = []
     rate_limit = 1000 # Calls per minute
     pause_duration = 60 / rate_limit # Pause in seconds between calls
+    date_offsets = [0, 30, 60]
 
     for cve, date in zip(cves, dates):
-        # Take the date before the CVE's first PoC exploit code was published
-        query_date = date.strftime('%Y-%m-%d')
-        url = f'{base_url}?cve={cve}&date={query_date}&pretty=true'
-        print(f'Called with URL : {url}')
+        epss_entry = {'cve_id': cve, 'epss_date': date}
 
-        try:
-            # Call the API
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            metadata = response.json()
+        for offset in date_offsets:
+            # Take the date before the CVE's first PoC exploit code was published
+            query_date = (date + timedelta(days=offset))
+            # Capture query date
+            epss_entry[f'epss_date_{offset}'] = query_date
+            # Format date for API call
+            query_date = query_date.strftime('%Y-%m-%d')
+            # Store query date for this offset
+            url = f'{base_url}?cve={cve}&date={query_date}&pretty=true'
+            print(f'Called with URL : {url}')
 
-            if 'data' in metadata and metadata['data']:
-                epss_data.append({
-                    'cve_id': cve,
-                    'epss_date': query_date,
-                    'epss': metadata['data'][0].get('epss'),
-                    'percentile': metadata['data'][0].get('percentile'),
-                })
-            else: # Record CVEs with missing scores for the given query date
-                missing_data.append({
-                    'cve_id': cve,
-                    'date': query_date,
-                    'reason': 'No records available.'
-                })
-        except requests.exceptions.RequestException as e:
-            missing_data.append({'cve_id': cve, 'date': query_date, 'reason': str(e)})
-        # Respect rate limit
-        time.sleep(pause_duration)
+            try:
+                # Call the API
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                metadata = response.json()
+
+                if 'data' in metadata and metadata['data']:
+                    epss_entry[f'epss_{offset}'] = metadata['data'][0].get('epss')
+                    epss_entry[f'percentile_{offset}'] = metadata['data'][0].get('percentile')
+                else: # Record CVEs with missing scores for the given query date
+                    missing_data.append({
+                        'cve_id': cve,
+                        'date': query_date,
+                        'reason': 'No records available.'
+                    })
+            except requests.exceptions.RequestException as e:
+                missing_data.append({'cve_id': cve, 'date': query_date, 'reason': str(e)})
+            # Respect rate limit
+            time.sleep(pause_duration)
+
+        epss_data.append(epss_entry)
 
     epss_df = pd.DataFrame(epss_data)
     missing_df = pd.DataFrame(missing_data)
@@ -80,8 +87,18 @@ def run_epss_extraction(
     # Load the CVEs
     input_data = pd.read_parquet(path=input_file)
     input_data = input_data.dropna(subset=['earliest_date'])
+    input_data = input_data[
+        input_data['earliest_date'] >= pd.Timestamp(
+            datetime(2021, 4, 14), tz='UTC'
+        )
+    ]
     cves = input_data['cve_id'].tolist()
     dates = pd.to_datetime(input_data['earliest_date']).tolist()
+
+    # # TEST: Limit number of CVEs
+    # cves = cves[:5]
+    # dates = dates[:5]
+
     base_url = 'https://api.first.org/data/v1/epss'
     headers = {'Accept': 'application/json'}
 
