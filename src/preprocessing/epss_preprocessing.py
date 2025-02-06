@@ -2,21 +2,16 @@
 This module contains the API client that communicates with FIRST's database to
 pull out EPSS data.
 '''
-
 import pandas as pd
-from utils import (
-    convert_cols,
-    save_data,
-    safely_drop_duplicates,
-    standardize_nulls,
-    strip_whitespace_from,
-    validate_cve_id
-)
+from utils import *
 
 COL_TYPES = {
     'string': ['cve_id'],
-    'date': ['epss_date'],
-    'float': ['epss', 'percentile']
+    'date': ['epss_date_0', 'epss_date_30', 'epss_date_60'],
+    'float': [
+        'epss_0', 'epss_30', 'epss_60',
+        'percentile_0', 'percentile_30', 'percentile_60'
+    ]
 }
 
 def run_epss_preprocessing(
