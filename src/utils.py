@@ -418,7 +418,7 @@ def harmonize_list_lengths(
     return df.apply(pad_row, axis=1)
 
 # § ============================================================================
-# § CVSS- and CVE-Specific Processing
+# § CVE-, CVSS-, and EPSS-Specific Processing
 # § ============================================================================
 def extract_cvss_metrics(
         df: pd.DataFrame,
@@ -616,6 +616,39 @@ def filter_cves(
 
     # Filter rows where a match was found
     return df[df['matched_keyword'].notna()].reset_index(drop=True)
+
+def impute_epss(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    Impute missing values in 'epss_0', 'epss_30', and 'epss_60' using linear
+    interpolation or extrapolation, when appropriate. The DataFrame requires
+    these 3 attributes and will only impute values for observations in which two
+    of them are not null.
+    Args:
+        df (pd.DataFrame): The DataFrame containing null EPSS values to impute.
+    Returns:
+        The DataFrame containing the imputed EPSS values that were possible.
+    '''
+    df = df.copy()  # Avoid modifying original dataframe
+
+    # Case 1: Interpolate missing epss_30
+    boolmask1 = df['epss_30'].isna() & df['epss_0'].notna() & df['epss_60'].notna()
+    df.loc[boolmask1, 'epss_30'] = (
+        df.loc[boolmask1, 'epss_0'] + df.loc[boolmask1, 'epss_60']
+    ) / 2
+
+    # Case 2: Extrapolate backwards missing epss_0
+    boolmask2 = df['epss_0'].isna() & df['epss_30'].notna() & df['epss_60'].notna()
+    df.loc[boolmask2, 'epss_0'] = df.loc[boolmask2, 'epss_30'] - (
+        df.loc[boolmask2, 'epss_60'] - df.loc[boolmask2, 'epss_30']
+    )
+
+    # Case 3: Extrapolate forward missing epss_60
+    boolmask3 = df['epss_60'].isna() & df['epss_30'].notna() & df['epss_0'].notna()
+    df.loc[boolmask3, 'epss_60'] = df.loc[boolmask3, 'epss_30'] + (
+        df.loc[boolmask3, 'epss_30'] - df.loc[boolmask3, 'epss_0']
+    )
+
+    return df
 
 # § ============================================================================
 # § Validation & Inspection
