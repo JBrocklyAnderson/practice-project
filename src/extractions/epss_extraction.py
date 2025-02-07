@@ -1,6 +1,9 @@
 '''
 This module is responsible for extracting EPSS scores from the API exposed by
-FIRST.
+FIRST. The filtering that takes place (e.g. removing CVEs whose exploit code
+publish dates occur prior to when EPSS scores began being calculated) accounts
+for the discrepancy between the number of non-null values in 'epss_date_0' and
+'exploitation_date' while working through the project's data_compilation script.
 '''
 import pandas as pd # For transforming gathered data
 import requests # For establishing contact with API
@@ -87,6 +90,9 @@ def run_epss_extraction(
     # Load the CVEs
     input_data = pd.read_parquet(path=input_file)
     input_data = input_data.dropna(subset=['earliest_date'])
+
+    # Filter out CVE's whose proof-of-concept exploit date occurs prior to when
+    #   EPSS started being calculated
     input_data = input_data[
         input_data['earliest_date'] >= pd.Timestamp(
             datetime(2021, 4, 14), tz='UTC'
