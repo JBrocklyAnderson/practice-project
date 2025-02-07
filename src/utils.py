@@ -420,6 +420,23 @@ def harmonize_list_lengths(
 # § ============================================================================
 # § CVE-, CVSS-, and EPSS-Specific Processing
 # § ============================================================================
+def calc_cvss_severity(score: float) -> str:
+    if score is None or not isinstance(score, float):
+        return np.nan  # Handle missing or invalid scores
+    # Map CVSS scores to severity levels
+    if score >= 9.0:
+        return 'CRITICAL'
+    elif score >= 7.0:
+        return 'HIGH'
+    elif score >= 4.0:
+        return 'MEDIUM'
+    elif score > 0.0:
+        return 'LOW'
+    elif score == 0.0:
+        return 'NONE'
+    else:
+        return 'UNKNOWN'
+
 def extract_cvss_metrics(
         df: pd.DataFrame,
         vector_col: str,
