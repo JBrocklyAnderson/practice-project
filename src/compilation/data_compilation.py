@@ -150,24 +150,24 @@ def run_data_compilation(
         'days_to_poc_exploit'
     ]
     cols_to_drop = [col for col in df.columns if col not in cols_to_keep]
-    cols_to_drop = [
-        'kev', # Captured in origin attribute
-        'public_date', # Captured in date_public
-        'date_published', # Captured in published date
-        'epss_date_0', # Captured in exploitation_date
-        'cvss_v2_vector', # Captured in cvss_vector
-        'cvss_v3_vector', # Captured in cvss_vector
-        'cvss_v4_vector', # Captured in cvss_vector
-        '_merge', # Merge artifact
-        'epss_merge', # Merge artifact
-        'nvd_merge', # Merge artifact
-        'availability_requirement', # No meaningful data
-        'availability_requirement_src', # No meaningful data
-        'confidentiality_requirement', # No meaningful data
-        'confidentiality_requirement_src', # No meaningful data
-        'integrity_requirement', # No meaningful data
-        'integrity_requirement_src', # No meaningful data
-    ]
+    # cols_to_drop = [
+    #     'kev', # Captured in origin attribute
+    #     'public_date', # Captured in date_public
+    #     'date_published', # Captured in published date
+    #     'epss_date_0', # Captured in exploitation_date
+    #     'cvss_v2_vector', # Captured in cvss_vector
+    #     'cvss_v3_vector', # Captured in cvss_vector
+    #     'cvss_v4_vector', # Captured in cvss_vector
+    #     '_merge', # Merge artifact
+    #     'epss_merge', # Merge artifact
+    #     'nvd_merge', # Merge artifact
+    #     'availability_requirement', # No meaningful data
+    #     'availability_requirement_src', # No meaningful data
+    #     'confidentiality_requirement', # No meaningful data
+    #     'confidentiality_requirement_src', # No meaningful data
+    #     'integrity_requirement', # No meaningful data
+    #     'integrity_requirement_src', # No meaningful data
+    # ]
     df = df.drop(columns=cols_to_drop)
     print('Columns dropped!\n')
 
@@ -181,11 +181,11 @@ def run_data_compilation(
         'exploitation_date_60', 'epss_60', 'percentile_60',
         'change_0_to_30', 'change_30_to_60', 'change_0_60',
     ]
-    remainder_cols = [
-        col for col in df.columns
-        if col not in ordered_cols and col != 'cvss_vector'
-    ]
-    ordered_cols = ordered_cols + ['cvss_vector'] + remainder_cols
+    # remainder_cols = [
+    #     col for col in df.columns
+    #     if col not in ordered_cols and col != 'cvss_vector'
+    # ]
+    # ordered_cols = ordered_cols + ['cvss_vector'] + remainder_cols
     df = df[ordered_cols]
     print('Columns reordered!\n')
 
