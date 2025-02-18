@@ -1,17 +1,10 @@
 '''
 This module contains the API client that communicates with FIRST's database to
-pull out EPSS data. Given EPSS scores on the date the exploit codes were
-published on ExploitDB, GitHub, or CISA's KEV catalogue, as well as 30 and 60
-days after the fact, the script makes a key assumption to impute via
-interpolation and extrapolation as many missing values as possible in the
-interest of a robust dataset. The assumption is that changes in scores across
-time, especially such a short window of time (2 months), are linear. This aspect
-of the script may very well be changed or improved upon in the future.
-
-So far, 38 scores were imputed for scores which would have otherwise been found
-30 days after the initial date. 108 scores were imputed for those which would
-have been found 60 days after. Accurately imputing any other scores were not
-possible given the linear methodology of the project.
+pull out EPSS data. This data was explored thoroughly to determine whether
+imputing EPSS and percentile data was possible with either mean or sigmoidal
+imputation, but no single observation has enough data points, and the relative
+minority of observations that do contain any EPSS scores most likely rules out
+the accuracy of more advanced imputation algorithms.
 '''
 import pandas as pd
 from utils import *
@@ -50,8 +43,8 @@ def run_epss_preprocessing(
             df[col] = pd.to_numeric(df[col])
 
     # Impute EPSS scores by averaging or extrapolation
-    df = impute_epss(df)
-    print('EPSS scores imputed!\n')
+    # df = impute_epss(df)
+    # print('EPSS scores imputed!\n')
 
     # Calculate change rates
     def percent_change_between_cols(col1: pd.Series, col2: pd.Series) -> pd.Series:

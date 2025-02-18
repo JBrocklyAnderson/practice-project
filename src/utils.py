@@ -9,7 +9,8 @@ import pandas as pd
 import numpy as np
 import json
 import re
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Tuple
+from scipy.optimize import curve_fit
 from mappings import (
     TOTAL_CVSS_MAPPINGS,
     CVSS_BASE_METRICS,
@@ -634,36 +635,146 @@ def filter_cves(
     # Filter rows where a match was found
     return df[df['matched_keyword'].notna()].reset_index(drop=True)
 
-def impute_epss(df: pd.DataFrame) -> pd.DataFrame:
+def impute(df: pd.DataFrame, impute_cases: Dict[str, str]) -> pd.DataFrame:
     '''
-    Impute missing values in 'epss_0', 'epss_30', and 'epss_60' using linear
-    interpolation or extrapolation, when appropriate. The DataFrame requires
-    these 3 attributes and will only impute values for observations in which two
-    of them are not null.
+    Impute missing values according to the impute_cases dictionary.
     Args:
-        df (pd.DataFrame): The DataFrame containing null EPSS values to impute.
+        df (pd.DataFrame): The DataFrame containing data to impute.
+        impute_cases (Dict[str, str]): Dictionary specifying imputation rules
+            for each target column.
+
+            Example format:
+            {
+                'epss_30': {
+                    'required': ['epss_0', 'epss_60'],
+                    'method': 'mean'
+                },
+                'percentile_0': {
+                    'required': ['percentile_30', 'percentile_60'],
+                    'method': 'sigmoid'
+                }
+            }
+
     Returns:
-        The DataFrame containing the imputed EPSS values that were possible.
+        The DataFrame containing imputed values.
     '''
     df = df.copy()  # Avoid modifying original dataframe
 
-    # Case 1: Interpolate missing epss_30
-    boolmask1 = df['epss_30'].isna() & df['epss_0'].notna() & df['epss_60'].notna()
-    df.loc[boolmask1, 'epss_30'] = (
-        df.loc[boolmask1, 'epss_0'] + df.loc[boolmask1, 'epss_60']
-    ) / 2
+    # Define sigmoid function
+    def sigmoid(
+            time_point: float,
+            growth_rate: float,
+            midpoint: float
+        ) -> float:
+        return 1 / (1 + np.exp(-growth_rate * (time_point - midpoint)))
 
-    # Case 2: Extrapolate backwards missing epss_0
-    boolmask2 = df['epss_0'].isna() & df['epss_30'].notna() & df['epss_60'].notna()
-    df.loc[boolmask2, 'epss_0'] = df.loc[boolmask2, 'epss_30'] - (
-        df.loc[boolmask2, 'epss_60'] - df.loc[boolmask2, 'epss_30']
-    )
+    # Fit a sigmoid curve to known data points
+    def fit_sigmoid(
+            known_time_points: np.ndarray,
+            known_values: np.ndarray
+        ) -> Union[Tuple, None]:
+        '''
+        Fits a sigmoid curve to the known data points and returns the best-
+        fitting paramaters.
+        '''
+        if len(known_values) < 2 or len(set(known_values)) == 1:
+            return None
 
-    # Case 3: Extrapolate forward missing epss_60
-    boolmask3 = df['epss_60'].isna() & df['epss_30'].notna() & df['epss_0'].notna()
-    df.loc[boolmask3, 'epss_60'] = df.loc[boolmask3, 'epss_30'] + (
-        df.loc[boolmask3, 'epss_30'] - df.loc[boolmask3, 'epss_0']
-    )
+        try:
+            params, _ = curve_fit(
+                sigmoid,
+                known_time_points,
+                known_values,
+                bounds=([-10, -np.inf], [10, np.inf])
+            )
+            return params # Returns growth_rate and midpoint
+        except RuntimeError:
+            return None # Failed to fit
+
+    def predict_sigmoid(
+            target_time_point: float,
+            known_time_points: np.ndarray,
+            known_values: np.ndarray,
+            full_col: pd.Series
+    ) -> float:
+        '''Predicts a missing value using a fitted sigmoid model.'''
+        col_mean = np.clip(full_col.mean(), 0, 1)
+
+        if len(known_values) < 2:
+            return col_mean
+
+        if len(set(known_values)) == 1:
+            return known_values[0]
+
+        fitted_parameters = fit_sigmoid(known_time_points, known_values)
+        if fitted_parameters is not None:
+            growth_rate, midpoint = fitted_parameters
+            predicted_value = sigmoid(target_time_point, growth_rate, midpoint)
+            return np.clip(predicted_value, 0, 1)
+        else:
+            return col_mean
+
+    def extract_time(col_name: str) -> int:
+        '''
+        Extracts the numeric time point from a column name with format col_n.
+        '''
+        return int(col_name.split('_')[-1])
+
+    df['imputation'] = pd.NA
+
+    for target_col, rule in impute_cases.items():
+        required_cols = rule['required']
+        method = rule['method']
+
+        # Create a boolean mask for rows where target_col is missing but
+        # required_cols are present
+        mask = df[target_col].isna() & df[required_cols].notna().all(axis=1)
+
+        if method == 'mean':
+            df.loc[mask, target_col] = df.loc[mask, required_cols].mean(axis=1)
+            df.loc[mask, 'imputation'] = df[mask].apply(lambda row: f'{target_col.upper()}: MEAN ({row[target_col]:.4f})', axis=1) 
+
+        elif method == 'sigmoid':
+            target_time_point = extract_time(target_col)
+
+            # Apply sigmoid imputation
+            for row_index in df[mask].index:
+                known_time_points = np.array(
+                    [extract_time(col) for col in required_cols]
+                )
+                known_values = df.loc[row_index, required_cols].values
+                full_col = df[target_col]
+
+                if len(known_values) < 1:
+                    df.at[row_index, 'imputation'] = 'IMPOSSIBLE'
+                    continue
+
+                df.at[row_index, target_col] = predict_sigmoid(
+                    target_time_point,
+                    known_time_points,
+                    known_values,
+                    full_col
+                )
+                df.at[row_index, 'imputation'] = f'{target_col}: SIGMOID ({df.at[row_index, target_col]:.4f})'
+    return df
+
+    # # Case 1: Interpolate missing epss_30
+    # boolmask1 = df['epss_30'].isna() & df['epss_0'].notna() & df['epss_60'].notna()
+    # df.loc[boolmask1, 'epss_30'] = (
+    #     df.loc[boolmask1, 'epss_0'] + df.loc[boolmask1, 'epss_60']
+    # ) / 2
+
+    # # Case 2: Extrapolate backwards missing epss_0
+    # boolmask2 = df['epss_0'].isna() & df['epss_30'].notna() & df['epss_60'].notna()
+    # df.loc[boolmask2, 'epss_0'] = df.loc[boolmask2, 'epss_30'] - (
+    #     df.loc[boolmask2, 'epss_60'] - df.loc[boolmask2, 'epss_30']
+    # )
+
+    # # Case 3: Extrapolate forward missing epss_60
+    # boolmask3 = df['epss_60'].isna() & df['epss_30'].notna() & df['epss_0'].notna()
+    # df.loc[boolmask3, 'epss_60'] = df.loc[boolmask3, 'epss_30'] + (
+    #     df.loc[boolmask3, 'epss_30'] - df.loc[boolmask3, 'epss_0']
+    # )
 
     return df
 

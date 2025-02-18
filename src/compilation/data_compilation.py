@@ -121,6 +121,16 @@ def run_data_compilation(
 
     # Recalculate CVSS severity levels
     df['cvss_severity'] = df['cvss'].apply(calc_cvss_severity)
+    print('CVSS severity levels recalculated!\n')
+
+    # Recalibrate EPSS dates
+    df['exploitation_date_30'] = df['exploitation_date_0'] + pd.to_timedelta(
+        30, unit='D'
+    )
+    df['exploitation_date_60'] = df['exploitation_date_0'] + pd.to_timedelta(
+        60, unit='D'
+    )
+    print('EPSS dates recalibrated!')
 
     # Convert datetypes
     df = convert_cols(df, COL_TYPES)
