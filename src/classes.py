@@ -7,7 +7,7 @@ import pandas as pd
 import seaborn as sbn
 import scipy.stats as stats
 import matplotlib.pyplot as plot
-from typing import Tuple
+from typing import Tuple, List
 
 class Plotter:
     '''A class for various plotting methods using matplotlib and Seaborn'''
@@ -86,7 +86,9 @@ class Plotter:
             xscale: str='linear',  # Options: 'linear', 'log', etc.
             yscale: str='linear',  # Options: 'linear', 'log', etc.
             transform: str=None,
-            kde: bool=True
+            kde: bool=True,
+            discrete: bool=False,
+            xlabels: List[str]=None
         ) -> None:
         '''Plots a histogram with KDE and custom styling.'''
         plot.figure(figsize=self.figsize)
@@ -99,7 +101,8 @@ class Plotter:
             bins=bins,
             color=color,
             alpha=alpha,
-            edgecolor='black'
+            edgecolor='black',
+            discrete=discrete
         )
 
         plot.title(title, fontsize=14)
@@ -114,6 +117,10 @@ class Plotter:
             plot.ylim(ylim)
         if self.grid:
             plot.grid(axis='y', linestyle='--', alpha=0.7)
+
+        # Customize x-axis labels if provided
+        if xlabels:
+            plot.xticks(ticks=range(len(xlabels)), labels=xlabels)
 
         self._save_plot(f"{title.replace(' ', '_').replace('-', '_').lower()}.png",)
         plot.show()
