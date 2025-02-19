@@ -174,16 +174,25 @@ class Plotter:
             title: str,
             xlabel: str,
             ylabel: str,
-            color: str = 'dodgerblue',
-            alpha: float = 0.7
+            color: str='dodgerblue',
+            fit_color: str='red',
+            alpha: float=0.7,
+            fit_line: bool=True
         ) -> None:
         '''Creates a scatter plot to show relationships between two variables.'''
         plot.figure(figsize=self.figsize)
+
         sbn.scatterplot(x=x, y=y, data=data, color=color, alpha=alpha)
+
+        if fit_line:
+            sbn.regplot(x=x, y=y, data=data, color=fit_color, scatter=False)
+
         plot.title(title, fontsize=14)
         plot.xlabel(xlabel, fontsize=12)
         plot.ylabel(ylabel, fontsize=12)
+
         if self.grid:
             plot.grid(alpha=0.5, linestyle='--')
-        self._save_plot(f"{title.replace(' ', '_')}.png")
+
+        self._save_plot(f"{title.replace(' ', '_').replace('-', '_').lower()}.png")
         plot.show()
