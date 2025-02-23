@@ -3,7 +3,7 @@
 ## Project Overview
 This project aims to analyze and prioritize software patches based on various criteria such as severity, exploitability, affected systems, and historical risk factors. By leveraging machine learning and data analytics, this project helps security teams focus on the most critical patches first.
 
-The last time MITRE's CVE Project filebase was pulled into the local repository from which this project extracts crucial CVE data was Wednesday, December 11, 2024.
+The last time MITRE's CVE Project filebase was pulled into the local repository from which this project extracts crucial CVE data was Wednesday, December $11$, $2024$.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -54,7 +54,7 @@ The general process of extracting and combining all this information can be foun
 ### MITRE
 
 #### CVE
-The entire database from MITRE's CVE project—some $280,000+$ JSON files—was pulled into the raw data directory of the project and an extraction script was designed to pull out data relating to a CVE's ID, description, discovery, and solution. Many features were extracted from CVSS vector strings including a CVE's attack vector and complexity, collateral damage, authentication requirements, and more, all of which can be found in the [data dictionary](#data-dictionary) below. Most were dropped from the focused dataset to hone in on the project's variables of interest.
+The entire database from MITRE's CVE project—some $280,000$+ JSON files—was pulled into the raw data directory of the project and an extraction script was designed to pull out data relating to a CVE's ID, description, discovery, and solution. Many features were extracted from CVSS vector strings including a CVE's attack vector and complexity, collateral damage, authentication requirements, and more, all of which can be found in the [data dictionary](#data-dictionary) below. Most were dropped from the focused dataset to hone in on the project's variables of interest.
 
 #### CWE
 The [CWE List Version 4.16](https://cwe.mitre.org/data/index.html) is pulled into the project as an XML file from MITRE that was used to extract CWE mappings and their IDs, descriptions, and other relevant information.
@@ -66,7 +66,7 @@ An API client that uses a list of CVEs to communicate with the NVD's database wa
 Another API client was built to extract EPSS data for the project's core CVEs at various dates starting from the moment in which the CVE's first proof-of-concept exploit code was published.
 
 ### ExploitDB
-A random sample of $20%$ of the CVEs (approx. $51,600$) were checked on ExploitDB to determine the number of exploit codes they had available and the date of the first one that was published.
+A random sample of $20$% of the CVEs (approx. $51600$) were checked on ExploitDB to determine the number of exploit codes they had available and the date of the first one that was published.
 
 ### PoC-in-GitHub
 Nomi Sec's GitHub repository was used to pulled as many CVEs with exploit codes into the project as possible, keeping data related to their occurence in numbers and the date of the soonest one that was published.
@@ -135,7 +135,7 @@ All of the `_src`-appended columns prioritize the newest version of CVSS that th
 | `cve_discovery` | How the CVE was discovered | String | `EXTERNAL` | MITRE |
 | `ssvc_exploitation` | Exploitation status of CVE in the SSVC scoring system | Categorical | `ACTIVE` | MITRE |
 | 'ssvc_automable` | Automatability of the CVE's exploitation in the SSVC scoring system | Categorical | `YES` | MITRE |
-| 'ssvc_tech_impact` | System impact of the CVE | Categorical in the SSVC scoring system | `PARTIAL` | MITRE |
+| 'ssvc_tech_impact` | System impact of the CVE | Categorical | `PARTIAL` | MITRE |
 | `attack_complexity` | Measures the complexity of the attack required to exploit the CVE | Categorical | `MEDIUM` | MITRE |
 | `attack_complexity_src` | Tracks the source version of the exploitation's complexity | Categorical | `V4` | MITRE |
 | `attack_requirements` | Conditions necessary for CVE exploitation to occur | Categorical | `PRESENT` | MITRE |
@@ -222,10 +222,10 @@ Pending
 
 ## Contact
 #### Joseph Brockly-Anderson
-<b>Project Analyst</b>
-B.A. in Political Science with Minor in Mandarin Chinese, U.C. Davis
-Phone: (530) 417-1973
-Email: jbrocklyanderson@gmail.com
+<p><b>Project Analyst</b></p>
+<p>B.A. in Political Science with Minor in Mandarin Chinese, U.C. Davis</p>
+<p>Phone: (530) 417-1973</p>
+<p>Email: jbrocklyanderson@gmail.com</p>
 
 <!-- ####
 <b>Project Administrator</b>
