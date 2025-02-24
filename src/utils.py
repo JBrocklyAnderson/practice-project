@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import json
 import re
+import scipy.stats as stats
 from typing import List, Dict, Union, Tuple
 from scipy.optimize import curve_fit
 from mappings import (
@@ -658,105 +659,105 @@ def impute(df: pd.DataFrame, impute_cases: Dict[str, str]) -> pd.DataFrame:
     Returns:
         The DataFrame containing imputed values.
     '''
-    df = df.copy()  # Avoid modifying original dataframe
+    # df = df.copy()  # Avoid modifying original dataframe
 
     # Define sigmoid function
-    def sigmoid(
-            time_point: float,
-            growth_rate: float,
-            midpoint: float
-        ) -> float:
-        return 1 / (1 + np.exp(-growth_rate * (time_point - midpoint)))
+    # def sigmoid(
+    #         time_point: float,
+    #         growth_rate: float,
+    #         midpoint: float
+    #     ) -> float:
+    #     return 1 / (1 + np.exp(-growth_rate * (time_point - midpoint)))
 
-    # Fit a sigmoid curve to known data points
-    def fit_sigmoid(
-            known_time_points: np.ndarray,
-            known_values: np.ndarray
-        ) -> Union[Tuple, None]:
-        '''
-        Fits a sigmoid curve to the known data points and returns the best-
-        fitting paramaters.
-        '''
-        if len(known_values) < 2 or len(set(known_values)) == 1:
-            return None
+    # # Fit a sigmoid curve to known data points
+    # def fit_sigmoid(
+    #         known_time_points: np.ndarray,
+    #         known_values: np.ndarray
+    #     ) -> Union[Tuple, None]:
+    #     '''
+    #     Fits a sigmoid curve to the known data points and returns the best-
+    #     fitting paramaters.
+    #     '''
+    #     if len(known_values) < 2 or len(set(known_values)) == 1:
+    #         return None
 
-        try:
-            params, _ = curve_fit(
-                sigmoid,
-                known_time_points,
-                known_values,
-                bounds=([-10, -np.inf], [10, np.inf])
-            )
-            return params # Returns growth_rate and midpoint
-        except RuntimeError:
-            return None # Failed to fit
+    #     try:
+    #         params, _ = curve_fit(
+    #             sigmoid,
+    #             known_time_points,
+    #             known_values,
+    #             bounds=([-10, -np.inf], [10, np.inf])
+    #         )
+    #         return params # Returns growth_rate and midpoint
+    #     except RuntimeError:
+    #         return None # Failed to fit
 
-    def predict_sigmoid(
-            target_time_point: float,
-            known_time_points: np.ndarray,
-            known_values: np.ndarray,
-            full_col: pd.Series
-    ) -> float:
-        '''Predicts a missing value using a fitted sigmoid model.'''
-        col_mean = np.clip(full_col.mean(), 0, 1)
+    # def predict_sigmoid(
+    #         target_time_point: float,
+    #         known_time_points: np.ndarray,
+    #         known_values: np.ndarray,
+    #         full_col: pd.Series
+    # ) -> float:
+    #     '''Predicts a missing value using a fitted sigmoid model.'''
+    #     col_mean = np.clip(full_col.mean(), 0, 1)
 
-        if len(known_values) < 2:
-            return col_mean
+    #     if len(known_values) < 2:
+    #         return col_mean
 
-        if len(set(known_values)) == 1:
-            return known_values[0]
+    #     if len(set(known_values)) == 1:
+    #         return known_values[0]
 
-        fitted_parameters = fit_sigmoid(known_time_points, known_values)
-        if fitted_parameters is not None:
-            growth_rate, midpoint = fitted_parameters
-            predicted_value = sigmoid(target_time_point, growth_rate, midpoint)
-            return np.clip(predicted_value, 0, 1)
-        else:
-            return col_mean
+    #     fitted_parameters = fit_sigmoid(known_time_points, known_values)
+    #     if fitted_parameters is not None:
+    #         growth_rate, midpoint = fitted_parameters
+    #         predicted_value = sigmoid(target_time_point, growth_rate, midpoint)
+    #         return np.clip(predicted_value, 0, 1)
+    #     else:
+    #         return col_mean
 
-    def extract_time(col_name: str) -> int:
-        '''
-        Extracts the numeric time point from a column name with format col_n.
-        '''
-        return int(col_name.split('_')[-1])
+    # def extract_time(col_name: str) -> int:
+    #     '''
+    #     Extracts the numeric time point from a column name with format col_n.
+    #     '''
+    #     return int(col_name.split('_')[-1])
 
-    df['imputation'] = pd.NA
+    # df['imputation'] = pd.NA
 
-    for target_col, rule in impute_cases.items():
-        required_cols = rule['required']
-        method = rule['method']
+    # for target_col, rule in impute_cases.items():
+    #     required_cols = rule['required']
+    #     method = rule['method']
 
-        # Create a boolean mask for rows where target_col is missing but
-        # required_cols are present
-        mask = df[target_col].isna() & df[required_cols].notna().all(axis=1)
+    #     # Create a boolean mask for rows where target_col is missing but
+    #     # required_cols are present
+    #     mask = df[target_col].isna() & df[required_cols].notna().all(axis=1)
 
-        if method == 'mean':
-            df.loc[mask, target_col] = df.loc[mask, required_cols].mean(axis=1)
-            df.loc[mask, 'imputation'] = df[mask].apply(lambda row: f'{target_col.upper()}: MEAN ({row[target_col]:.4f})', axis=1) 
+    #     if method == 'mean':
+    #         df.loc[mask, target_col] = df.loc[mask, required_cols].mean(axis=1)
+    #         df.loc[mask, 'imputation'] = df[mask].apply(lambda row: f'{target_col.upper()}: MEAN ({row[target_col]:.4f})', axis=1) 
 
-        elif method == 'sigmoid':
-            target_time_point = extract_time(target_col)
+    #     elif method == 'sigmoid':
+    #         target_time_point = extract_time(target_col)
 
-            # Apply sigmoid imputation
-            for row_index in df[mask].index:
-                known_time_points = np.array(
-                    [extract_time(col) for col in required_cols]
-                )
-                known_values = df.loc[row_index, required_cols].values
-                full_col = df[target_col]
+    #         # Apply sigmoid imputation
+    #         for row_index in df[mask].index:
+    #             known_time_points = np.array(
+    #                 [extract_time(col) for col in required_cols]
+    #             )
+    #             known_values = df.loc[row_index, required_cols].values
+    #             full_col = df[target_col]
 
-                if len(known_values) < 1:
-                    df.at[row_index, 'imputation'] = 'IMPOSSIBLE'
-                    continue
+    #             if len(known_values) < 1:
+    #                 df.at[row_index, 'imputation'] = 'IMPOSSIBLE'
+    #                 continue
 
-                df.at[row_index, target_col] = predict_sigmoid(
-                    target_time_point,
-                    known_time_points,
-                    known_values,
-                    full_col
-                )
-                df.at[row_index, 'imputation'] = f'{target_col}: SIGMOID ({df.at[row_index, target_col]:.4f})'
-    return df
+    #             df.at[row_index, target_col] = predict_sigmoid(
+    #                 target_time_point,
+    #                 known_time_points,
+    #                 known_values,
+    #                 full_col
+    #             )
+    #             df.at[row_index, 'imputation'] = f'{target_col}: SIGMOID ({df.at[row_index, target_col]:.4f})'
+    # return df
 
     # # Case 1: Interpolate missing epss_30
     # boolmask1 = df['epss_30'].isna() & df['epss_0'].notna() & df['epss_60'].notna()
@@ -860,3 +861,190 @@ def validate_cve_id(primary: str, backup: Union[str, List[str]]=None) -> str:
                 fixed_ordinal = ordinal.zfill(4)
                 return f'CVE-{year}-{fixed_ordinal}'
     return pd.NA
+
+# § ============================================================================
+# § Data Analysis
+# § ============================================================================
+def ad_norm_test(data_dict: Dict[str, str], confidence: float=5):
+    '''
+    Performs the Anderson-Darling test for normality on a dictionary of Series.
+    '''
+    # Define the confidence level options
+    confidence_levels = [15, 10, 5, 2.5, 1]
+
+    # Ensure the provided confidence level is valid
+    if confidence not in confidence_levels:
+        raise ValueError(
+            f'Invalid confidence level! Choose from {confidence_levels}'
+        )
+
+    print('\n\033[32;1mAnderson-Darling Normality Test:\033[0m')
+    for label, data in data_dict.items():
+        result = stats.anderson(data, dist='norm')
+        stat = result.statistic
+
+        # Get the corresponding critical value for the selected confidence level
+        index = confidence_levels.index(confidence)
+        critical_value = result.critical_values[index]
+
+        print(f'Test stat for {label}: \033[32;1m{stat:.2f}\033[0m')
+        print(
+            f'Critical value ({confidence}% confidence level): \033[32;1m{critical_value:.2f}\033[0m'
+        )
+
+        if stat > critical_value:
+            print(
+                'Because the test statistic is greater than the critical value at our desired alpha level, \033[32;1mwe must reject the null hypothesis.\033[0m\n')
+        else:
+            print(
+                'The test statistic is less than the critical value at our desired alpha level, therefore \033[32;1mwe fail to reject the null hypothesis.\033[0m\n'
+            )
+
+def bootstrap_correlation(
+        df: pd.DataFrame,
+        corr_pairs: List[Tuple[str, str]],
+        iterations: int=10000,
+        alpha: float=0.05
+    ):
+    '''
+    Performs bootstrap resampling to compute Spearman's and Kendall's correlation
+    coefficients along with their significance levels for given variable pairs.
+
+    Args:
+        - df (DataFrame): The input dataset containing the variables.
+        - corr_pairs (list of tuples): List of tuples where each tuple contains two column names.
+        - iterations (int): Number of bootstrap iterations (default=10000).
+        - alpha (float): Significance level threshold (default=0.05).
+
+    Returns:
+        - Dictionary containing mean correlations, standard deviations, and significance percentages.
+    '''
+    results = {}
+
+    # Initialize storage for correlation coefficients and significance counters
+    correlation_storage = {
+        pair: {
+            'spearman': [],
+            'kendall': [],
+            'spearman_significant': 0,
+            'kendall_significant': 0
+        }
+        for pair in corr_pairs
+    }
+
+    # Bootstrapping process
+    for _ in range(iterations):
+        sample_index = np.random.choice(len(df), size=len(df), replace=True)
+
+        # Generate bootstrap samples
+        sample_df = df.iloc[sample_index]
+
+        # Compute correlations for each variable pair
+        for var1, var2 in corr_pairs:
+            spearman_corr, spearman_p = stats.spearmanr(sample_df[var1], sample_df[var2])
+            kendall_corr, kendall_p = stats.kendalltau(sample_df[var1], sample_df[var2])
+
+            correlation_storage[(var1, var2)]['spearman'].append(spearman_corr)
+            correlation_storage[(var1, var2)]['kendall'].append(kendall_corr)
+
+            # Count significant correlations
+            if spearman_p < alpha:
+                correlation_storage[(var1, var2)]['spearman_significant'] += 1
+            if kendall_p < alpha:
+                correlation_storage[(var1, var2)]['kendall_significant'] += 1
+
+    # Compute final statistics
+    for (var1, var2), data in correlation_storage.items():
+        mean_spearman = np.mean(data['spearman'])
+        mean_kendall = np.mean(data['kendall'])
+        std_spearman = np.std(data['spearman'])
+        std_kendall = np.std(data['kendall'])
+
+        percent_spearman_significant = (data['spearman_significant'] / iterations) * 100
+        percent_kendall_significant = (data['kendall_significant'] / iterations) * 100
+
+        results[(var1, var2)] = {
+            'mean_spearman': mean_spearman,
+            'std_spearman': std_spearman,
+            'percent_spearman_significant': percent_spearman_significant,
+            'mean_kendall': mean_kendall,
+            'std_kendall': std_kendall,
+            'percent_kendall_significant': percent_kendall_significant
+        }
+
+    return results
+
+def compute_avg_time(
+        df: pd.DataFrame,
+        condition: pd.Series
+    ) -> Tuple[int, int, int, int]:
+    '''
+    Compute the average days from CVE publication to exploit publication, and
+    return it as (days, hours, minutes, seconds).
+    '''
+    avg_days = df.loc[condition, 'days_to_poc_exploit'].mean()
+    return compute_time_breakdown(avg_days)
+
+def compute_time_breakdown(days: pd.DataFrame) -> Tuple[float, float, float, float]:
+    '''Convert decimals days of a  into days, hours, minutes, and seconds.'''
+    if pd.isna(days):
+        return (0, 0, 0, 0)
+
+    hrs = (days % 1) * 24
+    mins = (hrs % 1) * 60
+    secs = (mins % 1) * 60
+
+    return days, hrs, mins, secs
+
+def ks_norm_test(data_dict: Dict[str, str]):
+    '''
+    Performs the Kolmogorov-Smirnov normality test on a dictionary of Series.
+    '''
+    print('\n\033[32;1mKolmogorov-Smirnov Normality Test:\033[0m')
+    for label, data in data_dict.items():
+        stat, p_value = stats.kstest(data, 'norm')
+        print(f'Test for {label}: \033[32;1m{stat:.2f}\033[0m | p-value: \033[32;1m{p_value:.2f}\033[0m')
+
+def non_parametric_corr(
+        x: pd.Series,
+        y: pd.Series,
+        label_x: str,
+        label_y: str
+    ) -> None:
+    '''
+    Computes Spearman's and Kendall's Tau correlation between two variables
+    and prints the results with formatted output.
+    Args:
+        x (array-like): First variable (e.g., CVSS, EPSS).
+        y (array-like): Second variable (e.g., Exploit Count, Days to Exploit).
+        label_x (str): Name of the first variable.
+        label_y (str): Name of the second variable.
+    '''
+
+    # Compute correlations
+    spearman_corr, spearman_p = stats.spearmanr(x, y)
+    kendall_corr, kendall_p = stats.kendalltau(x, y)
+
+    # Print results
+    print(f"Spearman's correlation between {label_x} and {label_y}: \033[32;1m{spearman_corr:.2f}\033[0m | p-value: \033[32;1m{spearman_p:.2f}\033[0m")
+    print(f"Kendall's Tau correlation between {label_x} and {label_y}: \033[32;1m{kendall_corr:.2f}\033[0m | p-value: \033[32;1m{kendall_p:.2f}\033[0m\n")
+
+def print_avg_time(
+        df: pd.DataFrame,
+        condition: pd.Series,
+        description: str
+    ) -> None:
+    '''Compute and print formatted statistics for a specific condition.'''
+    days, hrs, mins, secs = compute_avg_time(df, condition)
+    print(
+        f'Average number of days from CVE publication to publication of first exploit code for {description}: \033[32;1m{days:.0f} days {hrs:.0f} hours {mins:.0f} minutes {secs:.0f} seconds\033[0m.'
+    )
+
+def sw_norm_test(data_dict: Dict[str, str]):
+    '''
+    Performs the Shapiro-Wilk test for normality on a dictionary of Series data.
+    '''
+    print('\n\033[32;1mShapiro-Wilk Normality Test:\033[0m')
+    for label, data in data_dict.items():
+        stat, p_value = stats.shapiro(data)
+        print(f'Test for {label}: \033[32;1m{stat:.2f}\033[0m | p-value: \033[32;1m{p_value:.2f}\033[0m')
