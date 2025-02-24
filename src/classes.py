@@ -35,10 +35,10 @@ class Plotter:
         sbn.set_style(style)
         sbn.set_palette(palette)
         sbn.set_context(context, font_scale=font_scale)
-        self.figsize = figsize
-        self.grid = grid
-        self.save_fig = save_fig
-        self.save_path = save_path
+        self.figsize=figsize
+        self.grid=grid
+        self.save_fig=save_fig
+        self.save_path=save_path
 
     def _save_plot(
             self,
@@ -129,11 +129,11 @@ class Plotter:
             self,
             data: pd.DataFrame,
             column: str,
-            title: str,
+            title: str='',
             dist: str='norm',
             color: str='blue',
-            xlabel: str='',
-            ylabel: str='Frequency',
+            xlabel: str='Quantiles',
+            ylabel: str='',
             xlim: Tuple[float, float]=None,
             ylim: Tuple[float, float]=None,
             transform: str=None
@@ -167,13 +167,14 @@ class Plotter:
         self._save_plot(f"{dist}_{title.replace(' ', '_').replace('-', '_').lower()}.png")
         plot.show()
 
-    def plot_scatter(self,
+    def plot_scatter(
+            self,
             data: pd.DataFrame,
             x: str,
             y: str,
-            title: str,
-            xlabel: str,
-            ylabel: str,
+            title: str='',
+            xlabel: str='',
+            ylabel: str='',
             color: str='dodgerblue',
             fit_color: str='red',
             alpha: float=0.7,
@@ -195,4 +196,51 @@ class Plotter:
             plot.grid(alpha=0.5, linestyle='--')
 
         self._save_plot(f"{title.replace(' ', '_').replace('-', '_').lower()}.png")
+        plot.show()
+
+    def plot_box(
+            self,
+        data: pd.DataFrame,
+        column: str,
+        title: str='',
+        xlabel: str='',
+        ylabel: str='',
+        color: str='dodgerblue',
+        hue: str=None,  # Optional grouping variable
+        orient: str='v',  # 'v' for vertical, 'h' for horizontal
+        xlim: Tuple[float, float]=None,
+        ylim: Tuple[float, float]=None,
+        transform: str=None
+        ) -> None:
+        '''Creates a boxplot to visualize the distribution of a variable.'''
+
+        plot.figure(figsize=self.figsize)
+
+        # Apply transformation if needed
+        df_copy = self._apply_transform(data[column].dropna(), transform)
+
+        sbn.boxplot(
+            x=df_copy if orient == 'v' else None,
+            y=df_copy if orient == 'h' else None,
+            data=data,
+            color=color,
+            hue=hue,
+            orient=orient
+        )
+
+        # Customizing the plot
+        plot.title(title, fontsize=14)
+        plot.xlabel(xlabel, fontsize=12)
+        plot.ylabel(ylabel, fontsize=12)
+
+        if xlim:
+            plot.xlim(xlim)
+        if ylim:
+            plot.ylim(ylim)
+        if self.grid:
+            plot.grid(alpha=0.5, linestyle='--')
+
+        # Save if enabled
+        self._save_plot(f"{title.replace(' ', '_').replace('-', '_').lower()}.png")
+
         plot.show()
