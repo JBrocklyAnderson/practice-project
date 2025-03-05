@@ -76,7 +76,7 @@ def run_data_compilation(
         'earliest_date': 'exploitation_date_0',
         'epss_date_30': 'exploitation_date_30',
         'epss_date_60': 'exploitation_date_60',
-        'change_total': 'change_0_60'
+        'change_total': 'change_0_to_60'
     })
     print('Columns renamed!\n')
 
@@ -156,7 +156,7 @@ def run_data_compilation(
         'percentile_60',
         'change_0_to_30',
         'change_30_to_60',
-        'change_0_60',
+        'change_0_to_60',
         'days_to_poc_exploit'
     ]
     cols_to_drop = [col for col in df.columns if col not in cols_to_keep]
@@ -189,7 +189,7 @@ def run_data_compilation(
         'exploitation_date_0', 'epss_0', 'percentile_0',
         'exploitation_date_30', 'epss_30', 'percentile_30',
         'exploitation_date_60', 'epss_60', 'percentile_60',
-        'change_0_to_30', 'change_30_to_60', 'change_0_60',
+        'change_0_to_30', 'change_30_to_60', 'change_0_to_60',
     ]
     # remainder_cols = [
     #     col for col in df.columns
