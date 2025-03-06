@@ -140,6 +140,11 @@ def run_data_compilation(
     cols_to_keep = [
         'cve_id',
         'date_public',
+        'poc_code',
+        'verified',
+        'first_poc_type',
+        'first_poc_platform',
+        'first_poc_port',
         'exploit_count',
         'exploitation_date_0',
         'exploitation_date_30',
@@ -185,7 +190,9 @@ def run_data_compilation(
     ordered_cols = [
         'cve_id', 'date_public', 'origin',
         'cvss', 'cvss_severity', 'cvss_src',
+        'poc_code', 'verified',
         'exploit_count', 'days_to_poc_exploit',
+        'first_poc_type', 'first_poc_platform', 'first_poc_port',
         'exploitation_date_0', 'epss_0', 'percentile_0',
         'exploitation_date_30', 'epss_30', 'percentile_30',
         'exploitation_date_60', 'epss_60', 'percentile_60',
