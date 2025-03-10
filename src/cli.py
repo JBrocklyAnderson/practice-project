@@ -26,7 +26,8 @@ from preprocessing import (
     run_epss_preprocessing,
     run_poc_preprocessing,
     run_kev_preprocessing,
-    run_nvd_preprocessing
+    run_nvd_preprocessing,
+    run_ics_preprocessing
 )
 
 def def_args():
@@ -183,6 +184,23 @@ def def_args():
     )
 
     # § ========================================================================
+    # § Add input/output arguments for ICS data
+    # § ========================================================================
+    parser.add_argument(
+        '--ics-input', action='store', type=str,
+        help='Path to CSV file containing ICS data'
+    )
+    parser.add_argument(
+        '--ics-output', action='store', type=str,
+        help='Output file path for preprocessed ICS data'
+    )
+    parser.add_argument(
+        '--ics-format', action='store', type=str, default='parquet',
+        choices=['parquet', 'csv', 'xlsx'],
+        help='File format to save preprocessed ICS data'
+    )
+
+    # § ========================================================================
     # § Add input/output arguments for data compilation
     # § ========================================================================
     parser.add_argument(
@@ -269,6 +287,10 @@ def def_args():
     parser.add_argument(
         '--preprocess-nvd', action='store_true',
         help='Clean and preprocess NVD dataset'
+    )
+    parser.add_argument(
+        '--preprocess-ics', action='store_true',
+        help='Clean and preprocess ICS dataset'
     )
 
     # § ========================================================================
@@ -432,6 +454,13 @@ def run_tasks(args):
         output_file = args.nvd_output or f'data/processed/nvd/nvd_cleaned.{file_format}'
         print('Preprocessing NVD data...\n')
         run_nvd_preprocessing(input_file, output_file, file_format)
+
+    if args.preprocess_ics:
+        file_format = args.ics_format or 'parquet'
+        input_file = args.ics_input or 'data/raw/ics/ics.csv'
+        output_file = args.ics_output or f'data/processed/ics/ics.{file_format}'
+        print('Preprocessing ICS data...\n')
+        run_ics_preprocessing(input_file, output_file, file_format)
 
     # § ========================================================================
     # § Handle compilation
