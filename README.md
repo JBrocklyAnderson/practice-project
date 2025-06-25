@@ -79,8 +79,8 @@ Below is a set of two dictionaries describing all of the variables incorporated 
 | `date_public` | Date the CVE was published on MITRE | Datetime | `2024-04-15` | MITRE |
 | `origin` | CVE's original data source | Categorical | `poc_xdb_kev` | PoC-in-GitHub, ExploitDB, and/or KEV  |
 | `cvss` | CVSS score (newer versions prioritized) | Float | `7.2` | MITRE and/or NVD |
-| `cvss_severity' | Categorical representation of CVSS score | Categorical|  `HIGH` | MITRE and/or NVD |
-| `cvss_src' | CVSS score version (newer versions prioritized) | Categorical | `V3` | MITRE and/or NVD |
+| `cvss_severity` | Categorical representation of CVSS score | Categorical|  `HIGH` | MITRE and/or NVD |
+| `cvss_src` | CVSS score version (newer versions prioritized) | Categorical | `V3` | MITRE and/or NVD |
 | `exploit_count` | Number of exploit codes found on ExploitDB and GitHub | Float | `2` | PoC-in-GitHub and ExploitDB |
 | `days_to_poc_exploit` | Days from CVE publication to date of first exploit code | Float | `16` | PoC-in-GitHub and ExploitDB |
 | `exploitation_date_0` | Date of first exploit code publication | Datetime | `1996-06-01 00:00:00+0000` | PoC-in-GitHub and ExploitDB |
