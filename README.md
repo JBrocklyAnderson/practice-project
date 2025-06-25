@@ -24,8 +24,6 @@ The last time MITRE's CVE Project filebase was pulled into the local repository 
         - [For Conda Users](#for-conda-users)
         - [For Pip Users](#for-pip-users)
 - [Usage](#usage)
-- [Methodology](#methodology)
-- [Results](#results)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -211,14 +209,8 @@ pip install -r requirements.txt
 ## Usage
 In general, you can run any given script from the command line with `python src/main.py` followed by intuitive commands like `--extract-cve` (or `-cwe`, `-epss`, `-poc`, etc.), `--preprocess-cve` (or `-cwe`, `-epss`, `nvd`, etc.), and `--compile-data` (which requires cleaned versions of our data sources: `cve_cleaned`, `epss_cleaned`, `nvd_cleaned`, and `exploits_cleaned`). These commands can be issued with flags that change the relative pathways to the files they need to execute, the output destination, and the output file extension (currently limited to Parquet and CSV). These commands are also intuitive: `--cve-input`, `--kev-output`, `--epss-format`, etc.
 
-## Methodology
-Pending
-
-## Results
-Pending
-
 ## License
-Pending
+All rights reserved. 2025
 
 ## Contact
 #### Joseph Brockly-Anderson
@@ -226,9 +218,3 @@ Pending
 <p>B.A. in Political Science with Minor in Mandarin Chinese, U.C. Davis</p>
 <p>Phone: (530) 417-1973</p>
 <p>Email: jbrocklyanderson@gmail.com</p>
-
-<!-- ####
-<b>Project Administrator</b>
-
-Phone:
-Email:
